@@ -1,0 +1,12 @@
+.gradle
+build/
+.idea
+*.iml
+gradle-app.setting
+out/
+generated-sources/
+*.log*
+*.orig
+exploded/
+index/
+/src/main/resources/application.properties
