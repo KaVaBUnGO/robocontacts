@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<div class="container">
+    <div th:fragment="userForm">
+        <form id="userForm" th:object="${user}" method="post" data-toggle="validator"
+              action="#" th:action="@{/users/save}" class="pure-form pure-form-aligned" role="form">
+
+            <fieldset>
+                <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
+                    <p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="login">Логин: </label>
+                    <input id="login" type="text" th:field="*{login}" class="form-control" required="required" />
+                </div>
+
+                <div class="form-group" th:classappend="${password}">
+                    <label for="pwd">Пароль: </label>
+                    <input id="pwd" type="text" th:field="*{password}" class="form-control" required="required" />
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Роль:</label>
+                    <select th:field="*{role}" id="role" class="form-control">
+                        <option th:each="role : ${T(com.robocontacts.domain.Role).values()}"
+                                th:value="${role}" th:text="${role}"/>
+                    </select>
+                </div>
+                <input id="id" type="hidden" th:field="*{id}" class="form-control"/>
+
+            </fieldset>
+        </form>
+    </div>
+</div>
+</body>
+</html>

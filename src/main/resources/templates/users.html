@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+          href="../../css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/font-awesome-4.0.3/css/font-awesome.css}"
+          href="../../css/font-awesome-4.0.3/css/font-awesome.css" />
+    <link rel="stylesheet" th:href="@{/css/jquery-ui-1.10.4.custom.css}"
+          href="../../css/jquery-ui-1.10.4.custom.css" />
+    <link rel="stylesheet" th:href="@{/css/common.css}"
+          href="../../css/common.css" />
+    <script th:src="@{/js/lib/jquery-1.10.2.js}" src="../../js/lib/jquery-1.10.2.js"/>
+    <script th:src="@{/js/lib/jquery-ui-1.10.4.custom.js}" src="../../js/lib/jquery-ui-1.10.4.custom.js"/>
+    <script th:src="@{/js/users.js}" src="../../js/users.js"/>
+</head>
+<body>
+<div th:replace="fragments/header :: header">&nbsp;</div>
+
+<div class="container">
+    <div style="width: 95%; margin: 0 auto;">
+        <div id="userDialog" style="display: none;">
+            <div th:replace="userForm :: userForm">&nbsp;</div>
+        </div>
+        <div id="dialog-confirm" title="Delete?" style="display: none;">
+            <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0; "></span>
+                Delete this user. Are you sure?</p>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading"><h2>Список пользователей</h2></div>
+            <div class="panel-body">
+                <button type="button" class="btn btn-primary" onclick="addUser()" style="margin-bottom: 10px;">
+                    <i class="fa fa-plus"></i> Добавить пользователя
+                </button>
+                <br/>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th width="20%">Логин</th>
+                        <th width="20%">Роль</th>
+                        <th width="20%">Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user : ${users}" th:id="'user-' + ${user.id}">
+                        <td th:text="${user.login}">user login</td>
+                        <td th:text="${user.role}">user role</td>
+
+                        <td><nobr>
+                            <button class="btn btn-primary"
+                                    onclick=""
+                                    th:onclick="'javascript:editUser(\'' + ${user.id} + '\');'">
+                                <i class="fa fa-pencil"></i> Редактировать
+                            </button>
+
+                            <a class="btn btn-primary"
+                               onclick="return confirm('Вы уверены, что хотите удалить выбранного пользователя?');"
+                               th:onclick="'javascript:deleteUser(\'' + ${user.id} + '\');'">
+                                <i class="fa fa-times"></i>Удалить
+                            </a>
+
+                        </nobr></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

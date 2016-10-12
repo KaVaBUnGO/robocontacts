@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registration</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+          href="../../css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/font-awesome-4.0.3/css/font-awesome.css}"
+          href="../../css/font-awesome-4.0.3/css/font-awesome.css" />
+    <link rel="stylesheet" th:href="@{/css/jquery-ui-1.10.4.custom.css}"
+          href="../../css/jquery-ui-1.10.4.custom.css" />
+    <script th:src="@{/js/lib/jquery-1.10.2.js}" src="../../js/lib/jquery-1.10.2.js"/>
+    <script th:src="@{/js/lib/jquery-ui-1.10.4.custom.js}" src="../../js/lib/jquery-ui-1.10.4.custom.js"/>
+</head>
+<body>
+<div th:replace="fragments/header :: header">&nbsp;</div>
+<div class="container">
+    <div id="signupbox" style="margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="content">
+
+            <h2>Создание нового пользователя</h2>
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title">Регистрация</div>
+                    <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" href="#" th:href="@{/login}">Логин</a></div>
+                </div>
+                <div class="panel-body" >
+                    <form name="form" id="signupform" th:action="@{/user/create}" action="/user/create" method="POST"
+                          class="form-horizontal" role="form" th:object="${form}" data-toggle="validator">
+                        <fieldset>
+
+                            <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
+                                <p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
+                            </div>
+
+                            <div id="signupalert" style="display:none" class="alert alert-danger">
+                                <p>Error:</p>
+                                <span></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="login" class="col-md-3 control-label">Логин</label>
+                                <div class="col-md-9">
+                                    <input id="login" type="text" class="form-control" name="login" placeholder="Login"
+                                           th:field="*{login}" required="required" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password" class="col-md-3 control-label">Пароль</label>
+                                <div class="col-md-9">
+                                    <input id="password" type="password" class="form-control" name="passwd"
+                                           placeholder="Password" th:field="*{password}" required="required" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password-confirm" class="col-md-3 control-label">Подтвердите пароль</label>
+                                <div class="col-md-9">
+                                    <input id="password-confirm" type="password" class="form-control" name="passwd"
+                                           placeholder="Confirm password" th:field="*{passwordRepeated}" required="required" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <input type="submit" value="    Зарегистрироваться" id="signup" class="btn btn-info"/>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

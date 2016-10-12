@@ -1,23 +1,26 @@
 buildscript {
 	ext {
-		springBootVersion = '1.4.0.RELEASE'
+		springBootVersion = '1.2.5.RELEASE'
+		springLoadedVersion = '1.2.4.RELEASE'
 	}
 	repositories {
+		mavenLocal()
 		mavenCentral()
+		maven { url "http://repo.spring.io/libs-release" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("org.springframework:springloaded:${springLoadedVersion}")
 	}
 }
 
+group 'robocontacts'
+version '1.0-SNAPSHOT'
+
 apply plugin: 'java'
-apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
-jar {
-	baseName = ''
-	version = '0.0.1-SNAPSHOT'
-}
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -25,8 +28,24 @@ repositories {
 	mavenCentral()
 }
 
-
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-data-jpa');
+	compile('org.postgresql:postgresql:9.4-1201-jdbc41')
+	compile('org.springframework.boot:spring-boot-starter-security');
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf');
+	compile('org.thymeleaf.extras:thymeleaf-extras-springsecurity3');
+	runtime("org.hsqldb:hsqldb")
+	compile('org.springframework:spring-context-support');
+	compile('javax.mail:mail:1.4.1');
+	compile('com.icegreen:greenmail:1.4.0');
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('com.jayway.jsonpath:json-path:2.0.0')
+	//runtime files('lib/db2cc4.jar')
+
+	testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.3'
 }
