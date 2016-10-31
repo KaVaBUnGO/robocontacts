@@ -21,7 +21,9 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/users}" href="/users"> Пользователи </a></li>
-
+                    <li sec:authorize="isAuthenticated()">Вы зашли под: <div sec:authentication="name"></div></li>
+                    <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/profile}" href="profile"> Профиль </a></li>
+                    <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/settings}" href="settings"> Настройки </a></li>
                     <li sec:authorize="isAnonymous()"><a th:href="@{/login}" href="login"> Войти </a></li>
                     <li sec:authorize="isAnonymous()"><a th:href="@{/user/create}" href="/user/create"> Регистрация </a></li>
                     <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}" href="logout"> Выйти </a></li>

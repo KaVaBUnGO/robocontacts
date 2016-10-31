@@ -1,6 +1,8 @@
 package com.robocontacts.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ekaterina on 15.09.2016.
@@ -23,6 +25,10 @@ public class User {
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<SocialPlatform> socialPlatforms = new ArrayList<>();
+
 
     public Long getId() {
         return id;
