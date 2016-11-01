@@ -8,6 +8,7 @@
     <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
     <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
     <meta name="format-detection" content="telephone=no"/>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon"/>
     <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">ROBOCONTACTS</title>
 
     <link rel="stylesheet" th:href="@{/css/lib/bootstrap.css}"/>
