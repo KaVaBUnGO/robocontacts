@@ -1,7 +1,7 @@
 buildscript {
 	ext {
-		springBootVersion = '1.2.5.RELEASE'
-		springLoadedVersion = '1.2.4.RELEASE'
+		springBootVersion = '1.4.1.RELEASE'
+		springLoadedVersion = '1.2.6.RELEASE'
 	}
 	repositories {
 		mavenLocal()
@@ -31,26 +31,31 @@ repositories {
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-data-jpa');
-	compile('org.postgresql:postgresql:9.4-1201-jdbc41')
 	compile('org.springframework.boot:spring-boot-starter-security');
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf');
-	compile('org.thymeleaf.extras:thymeleaf-extras-springsecurity3');
+	compile('org.thymeleaf.extras:thymeleaf-extras-springsecurity4');
 	runtime("org.hsqldb:hsqldb")
-	compile('org.springframework:spring-context-support');
-	compile('javax.mail:mail:1.4.1');
-
-
-	compile('com.icegreen:greenmail:1.4.0');
-
 	compile('com.vk.api:sdk:0.3.3');
 
+	//compile('org.springframework:spring-context-support');
+	//compile('javax.mail:mail:1.4.1');
+	//compile('org.postgresql:postgresql:9.4-1201-jdbc41')
+	//compile('com.icegreen:greenmail:1.4.0');
+
 	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('com.jayway.jsonpath:json-path:2.0.0')
+	// testCompile('com.jayway.jsonpath:json-path:2.0.0')
 	//runtime files('lib/db2cc4.jar')
 
 	testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.3'
+	gradleVersion = '3.1'
+}
+
+idea {
+	module {
+		inheritOutputDirs = false
+		outputDir = file("$buildDir/classes/main/")
+	}
 }

@@ -1,18 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html layout:decorator="layouts/layoutDefault" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <title>Registration</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
-          href="../../css/bootstrap.min.css" />
-    <link rel="stylesheet" th:href="@{/css/font-awesome-4.0.3/css/font-awesome.css}"
-          href="../../css/font-awesome-4.0.3/css/font-awesome.css" />
-    <link rel="stylesheet" th:href="@{/css/jquery-ui-1.10.4.custom.css}"
-          href="../../css/jquery-ui-1.10.4.custom.css" />
-    <script th:src="@{/js/lib/jquery-1.10.2.js}" src="../../js/lib/jquery-1.10.2.js"/>
-    <script th:src="@{/js/lib/jquery-ui-1.10.4.custom.js}" src="../../js/lib/jquery-ui-1.10.4.custom.js"/>
+    <title>Create user</title>
 </head>
 <body>
-<div th:replace="fragments/header :: header">&nbsp;</div>
+<th:block layout:fragment="content">
 <div class="container">
     <div id="signupbox" style="margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
         <div class="content">
@@ -75,5 +68,6 @@
         </div>
     </div>
 </div>
+    </th:block>
 </body>
 </html>

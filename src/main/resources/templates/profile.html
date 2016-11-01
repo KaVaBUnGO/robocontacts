@@ -1,29 +1,26 @@
 <!DOCTYPE html>
-<html xmlns:="http://www.thymeleaf.org">
+<html layout:decorator="layouts/layoutDefault" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <title>Home page</title>
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <title>Profile</title>
 </head>
 <body>
+<th:block layout:fragment="content">
 
-<div th:replace="fragments/header :: header">&nbsp;</div>
-
-<div>Подключенные платформы</div>
-<div>
----------------------
-
-</div>
-<form th:action="@{/profile}" th:object="${form}" th:method="post">
-<div class="col-md-3 col-lg-3">
-    <button class="form-control btn btn-success" name="connectVk" type="submit" style="margin-top: 15px;">Подключить Vkontakte</button>
+    <div>Подключенные платформы</div>
     <div>
+        ---------------------
 
     </div>
-    <button class="form-control btn btn-success" name="connectGoogle" type="submit" style="margin-top: 15px;">Подключить Google</button>
-</div>
-</form>
+    <form th:action="@{/profile}" th:object="${form}" th:method="post">
+        <div class="col-md-3 col-lg-3">
+            <button class="form-control btn btn-success" name="connectVk" type="submit" style="margin-top: 15px;">Подключить Vkontakte</button>
+            <div>
+
+            </div>
+            <button class="form-control btn btn-success" name="connectGoogle" type="submit" style="margin-top: 15px;">Подключить Google</button>
+        </div>
+    </form>
+</th:block>
 </body>
 </html>

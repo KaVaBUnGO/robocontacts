@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">ROBOCONTACTS</title>
+
+    <link rel="stylesheet" th:href="@{/css/lib/bootstrap.css}"/>
+
+    <script th:inline="javascript">
+        // @formatter:off
+      /*<![CDATA[*/
+      var context = [[@{/}]];
+      var defErrMsg = "Temporary server Error. Please try again later.";
+      /*]]>*/
+      // @formatter:on
+    </script>
+</head>
+<body>
+    <div layout:fragment="pageModal"></div>
+    <header>
+        <div th:replace="fragments/navigation :: navigation" />
+    </header>
+    <main>
+        <div layout:fragment="content" />
+    </main>
+    <footer>
+        <div th:replace="fragments/footer :: footer"/>
+    </footer>
+    <script type="text/javascript" th:src="@{/js/lib/jquery-3.1.1.js}"></script>
+    <script type="text/javascript" th:src="@{/js/lib/bootstrap.js}"></script>
+
+    <div layout:fragment="pageScript" />
+</body>
+</html>
