@@ -34,7 +34,6 @@ public class ProfileController {
     @RequestMapping(value = PATH_ROOT, method = RequestMethod.POST, params = {"connectGoogle"})
     public String build(Model model) {
 
-
         return "/profile";
     }
 

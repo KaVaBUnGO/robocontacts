@@ -43,6 +43,7 @@ public class VkService {
             UserActor actor = new UserActor(authResponse.getUserId(), authResponse.getAccessToken());
             LOGGER.debug("Actor {}", actor);
         } catch (OAuthException e) {
+
             e.getRedirectUri();
         } catch (Exception e) {
             e.printStackTrace();

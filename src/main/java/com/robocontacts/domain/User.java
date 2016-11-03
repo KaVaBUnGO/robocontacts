@@ -29,6 +29,13 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<SocialPlatform> socialPlatforms = new ArrayList<>();
 
+    public List<SocialPlatform> getSocialPlatforms() {
+        return socialPlatforms;
+    }
+
+    public void setSocialPlatforms(List<SocialPlatform> socialPlatforms) {
+        this.socialPlatforms = socialPlatforms;
+    }
 
     public Long getId() {
         return id;

@@ -5,6 +5,8 @@ package com.robocontacts.domain;
  */
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.util.List;
+
 public class UserCreateForm {
     @NotEmpty
     private String login="";
@@ -38,4 +40,5 @@ public class UserCreateForm {
     public void setPasswordRepeated(String passwordRepeated) {
         this.passwordRepeated = passwordRepeated;
     }
+
 }
