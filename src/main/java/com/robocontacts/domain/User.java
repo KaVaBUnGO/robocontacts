@@ -1,6 +1,7 @@
 package com.robocontacts.domain;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,40 +10,28 @@ import java.util.List;
  */
 
 @Entity
-@Table(name="users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable = false, updatable = false)
-    private Long id;
+public class User extends BasicEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    @Column(name = "login", nullable = false)
+    @Column(nullable = false)
     private String login;
 
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @Column(name = "role", nullable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<SocialPlatform> socialPlatforms = new ArrayList<>();
+    private List<ConnectedPlatform> socialPlatforms = new ArrayList<>();
 
-    public List<SocialPlatform> getSocialPlatforms() {
+    public List<ConnectedPlatform> getSocialPlatforms() {
         return socialPlatforms;
     }
 
-    public void setSocialPlatforms(List<SocialPlatform> socialPlatforms) {
+    public void setSocialPlatforms(List<ConnectedPlatform> socialPlatforms) {
         this.socialPlatforms = socialPlatforms;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getLogin() {

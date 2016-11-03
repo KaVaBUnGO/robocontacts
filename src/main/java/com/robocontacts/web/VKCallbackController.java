@@ -1,5 +1,6 @@
 package com.robocontacts.web;
 
+import com.robocontacts.domain.ConnectedPlatform;
 import com.robocontacts.domain.CurrentUser;
 import com.robocontacts.domain.SocialPlatform;
 import com.robocontacts.repository.SocialPlatformRepository;
@@ -18,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class VKCallbackController {
 
-
     private final VkService vkService;
     private final SocialPlatformRepository socialPlatformRepository;
 
@@ -31,13 +31,12 @@ public class VKCallbackController {
     @RequestMapping("callback")
     public String callback(HttpServletRequest httpServletRequest){
         vkService.connect(httpServletRequest.getParameter("code"));
-        SocialPlatform socialPlatform = new SocialPlatform();
-        socialPlatform.setAccessToken(httpServletRequest.getParameter("code"));
+        ConnectedPlatform connectedPlatform = new ConnectedPlatform();
+        connectedPlatform.setAccessToken(httpServletRequest.getParameter("code"));
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        socialPlatform.setUser((currentUser.getUser()));
-        socialPlatform.setName("Vk");
-        socialPlatformRepository.save(socialPlatform);
+        connectedPlatform.setUser((currentUser.getUser()));
+        connectedPlatform.setSocialPlatform(SocialPlatform.VK);
+        socialPlatformRepository.save(connectedPlatform);
         return "redirect:/profile";
     }
-
 }
