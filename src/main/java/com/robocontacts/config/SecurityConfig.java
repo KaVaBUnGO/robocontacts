@@ -23,13 +23,17 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final UserDetailsService userDetailsService;
+
     @Autowired
-    private UserDetailsService userDetailsService;
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception{
+    protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/rest/**", "/fonts/**").permitAll()
+                .antMatchers("/fonts/**").permitAll()
                 .antMatchers("/").permitAll()
                 .antMatchers("/user/create").permitAll()
                 .anyRequest().fullyAuthenticated()

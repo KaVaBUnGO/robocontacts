@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -36,17 +36,19 @@ public class UserController {
     protected static final String PATH_GET = "users/get/{userId}";
     protected static final String PATH_DELETE = "/users/delete/{userId}";
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final UserCreateFormValidator userCreateFormValidator;
 
     @Autowired
-    private UserCreateFormValidator userCreateFormValidator;
+    public UserController(UserService userService, UserCreateFormValidator userCreateFormValidator) {
+        this.userService = userService;
+        this.userCreateFormValidator = userCreateFormValidator;
+    }
 
     @InitBinder("form")
     public void initBinder(WebDataBinder binder){
         binder.addValidators(userCreateFormValidator);
     }
-
 
     @RequestMapping(value = PATH_CREATE, method = RequestMethod.GET)
     public String getUserCreatePage(Model model) {
@@ -57,7 +59,6 @@ public class UserController {
 
     @RequestMapping(value = PATH_CREATE, method = RequestMethod.POST)
     public String handleUserCreateForm(@Valid @ModelAttribute("form") UserCreateForm form, BindingResult bindingResult) {
-
         LOGGER.debug("Processing user create form={}, bindingResult={}", form, bindingResult);
         if (bindingResult.hasErrors()) {
             return "userCreate";
@@ -114,7 +115,4 @@ public class UserController {
         userService.delete(user);
         return "redirect:/users";
     }
-
-
-
 }

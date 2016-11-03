@@ -2,9 +2,7 @@ package com.robocontacts.web;
 
 import com.robocontacts.domain.CurrentUser;
 import com.robocontacts.domain.SocialPlatform;
-import com.robocontacts.domain.User;
 import com.robocontacts.repository.SocialPlatformRepository;
-import com.robocontacts.service.CurrentUserDetailsService;
 import com.robocontacts.service.VkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,14 +19,14 @@ import javax.servlet.http.HttpServletRequest;
 public class VKCallbackController {
 
 
-    @Autowired
-    private VkService vkService;
+    private final VkService vkService;
+    private final SocialPlatformRepository socialPlatformRepository;
 
     @Autowired
-    private SocialPlatformRepository socialPlatformRepository;
-
-    @Autowired
-    private CurrentUserDetailsService currentUserDetailsService;
+    public VKCallbackController(SocialPlatformRepository socialPlatformRepository, VkService vkService) {
+        this.socialPlatformRepository = socialPlatformRepository;
+        this.vkService = vkService;
+    }
 
     @RequestMapping("callback")
     public String callback(HttpServletRequest httpServletRequest){

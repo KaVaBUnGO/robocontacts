@@ -15,10 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class ProfileController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
-    protected static final String PATH_ROOT = "/profile";
+    private static final String PATH_ROOT = "/profile";
+
+    private final VkService vkService;
 
     @Autowired
-    private VkService vkService;
+    public ProfileController(VkService vkService) {
+        this.vkService = vkService;
+    }
 
     @RequestMapping(PATH_ROOT)
     public String getProfilePage(Model model) {

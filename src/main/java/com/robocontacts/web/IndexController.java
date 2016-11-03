@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class IndexController {
     private static final Logger LOGGER    = LoggerFactory.getLogger( IndexController.class );
-    protected static final String PATH_ROOT = "/";
+    private static final String PATH_ROOT = "/";
     @RequestMapping( PATH_ROOT )
     public String getHomePage( Model model ) {
         LOGGER.debug( "Getting home page" );
