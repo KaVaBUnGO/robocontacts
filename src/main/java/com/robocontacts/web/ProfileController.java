@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 public class ProfileController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
-    private static final String PATH_ROOT = "/profile";
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final VkService vkService;
 
@@ -24,20 +23,19 @@ public class ProfileController {
         this.vkService = vkService;
     }
 
-    @RequestMapping(PATH_ROOT)
+    @RequestMapping("/profile")
     public String getProfilePage(Model model) {
-        LOGGER.debug("Getting home page");
+        log.debug("Getting home page");
         return "profile";
     }
 
-    @RequestMapping(value = PATH_ROOT, method = RequestMethod.POST, params = {"connectVk"})
+    @RequestMapping(value = "/profile", method = RequestMethod.POST, params = {"connectVk"})
     public String connectVk(Model model) {
-        return "redirect:" + vkService.auth();
+        return "redirect:" + vkService.getOAuthUrl();
     }
 
-    @RequestMapping(value = PATH_ROOT, method = RequestMethod.POST, params = {"connectGoogle"})
+    @RequestMapping(value = "/profile", method = RequestMethod.POST, params = {"connectGoogle"})
     public String build(Model model) {
-
         return "/profile";
     }
 

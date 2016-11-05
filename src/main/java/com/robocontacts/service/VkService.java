@@ -6,9 +6,13 @@ import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.OAuthException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.objects.UserAuthResponse;
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.net.URISyntaxException;
 
 
 /**
@@ -17,36 +21,57 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class VkService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(VkService.class);
-    private static final String REDIRECT_URI = "http://localhost:8080/callback";
-    private static final Integer APP_ID = 5683209;
-    private static final String CLIENT_SECRET = "cEHoBbnhZEcTiDDfA8l1";
-    private static final String code = "friends";
+    private static final Logger log = LoggerFactory.getLogger(VkService.class);
 
-    public String auth() {
-        return getOAuthUrl();
+    @Value("${application.hostname}")
+    private String host;
+
+    @Value("${platforms.vk.app.id}")
+    private Integer appId;
+
+    @Value("${platforms.vk.app.secret}")
+    private String appSecret;
+
+    @Value("${platforms.vk.app.code}")
+    private String code;
+
+    @Value("${platforms.vk.app.redirectUrl}")
+    private String redirectUri;
+
+    public String getOAuthUrl() {
+        try {
+            URIBuilder uriBuilder = new URIBuilder("https://oauth.vk.com/authorize");
+            uriBuilder.addParameter("client_id", String.valueOf(appId));
+            uriBuilder.addParameter("display", "page");
+            uriBuilder.addParameter("redirect_uri", getRedirectUri());
+            uriBuilder.addParameter("scope", "groups");
+            uriBuilder.addParameter("response_type", "code");
+            return uriBuilder.toString();
+        } catch (URISyntaxException e) {
+            log.debug("Create VK oauth url failed");
+            // todo: implement custom exceptions later
+            throw new RuntimeException("Create VK oauth url failed");
+        }
     }
-
-    private String getOAuthUrl() {
-        return "https://oauth.vk.com/authorize?client_id=" + APP_ID + "&display=page&redirect_uri=" +
-                REDIRECT_URI + "&scope=groups&response_type=code";
-    }
-
 
     public void connect(String code) {
         try {
             TransportClient transportClient = new HttpTransportClient();
             VkApiClient vk = new VkApiClient(transportClient);
             UserAuthResponse authResponse = vk.oauth()
-                    .userAuthorizationCodeFlow(APP_ID, CLIENT_SECRET, REDIRECT_URI, code)
+                    .userAuthorizationCodeFlow(appId, appSecret, getRedirectUri(), code)
                     .execute();
             UserActor actor = new UserActor(authResponse.getUserId(), authResponse.getAccessToken());
-            LOGGER.debug("Actor {}", actor);
+            log.debug("Actor {}", actor);
         } catch (OAuthException e) {
 
             e.getRedirectUri();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String getRedirectUri() {
+        return host + redirectUri;
     }
 }

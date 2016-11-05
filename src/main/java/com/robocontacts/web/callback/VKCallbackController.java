@@ -1,4 +1,4 @@
-package com.robocontacts.web;
+package com.robocontacts.web.callback;
 
 import com.robocontacts.domain.ConnectedPlatform;
 import com.robocontacts.domain.CurrentUser;
@@ -28,7 +28,7 @@ public class VKCallbackController {
         this.vkService = vkService;
     }
 
-    @RequestMapping("callback")
+    @RequestMapping("/callback")
     public String callback(HttpServletRequest httpServletRequest){
         vkService.connect(httpServletRequest.getParameter("code"));
         ConnectedPlatform connectedPlatform = new ConnectedPlatform();
