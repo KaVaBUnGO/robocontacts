@@ -25,10 +25,18 @@ public class ProfileController {
 
     @RequestMapping("/profile")
     public String getProfilePage(Model model) {
+
         log.debug("Getting home page");
         return "profile";
     }
 
+    /*
+    @RequestMapping(value = "/profile", method = RequestMethod.GET)
+    public String displayProfileVk(Model model){
+
+        return "/vkPage";
+    }
+*/
     @RequestMapping(value = "/profile", method = RequestMethod.POST, params = {"connectVk"})
     public String connectVk(Model model) {
         return "redirect:" + vkService.getOAuthUrl();

@@ -22,6 +22,12 @@ public class ConnectedPlatform extends BasicEntity implements Serializable {
     @Column(name = "access_token", nullable = false)
     private String accessToken;
 
+    @Column(name = "expires_in", nullable = false)
+    private long expiresIn;
+
+    @Column(name = "vk_id", nullable = false)
+    private long vkId;
+
     public SocialPlatform getSocialPlatform() {
         return socialPlatform;
     }
@@ -44,5 +50,21 @@ public class ConnectedPlatform extends BasicEntity implements Serializable {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public long getExpiresIn() {
+        return expiresIn;
+    }
+
+    public void setExpiresIn(long expiresIn) {
+        this.expiresIn = expiresIn;
+    }
+
+    public long getVkId() {
+        return vkId;
+    }
+
+    public void setVkId(long vkId) {
+        this.vkId = vkId;
     }
 }

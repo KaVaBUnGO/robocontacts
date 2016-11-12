@@ -1,5 +1,8 @@
 package com.robocontacts.service;
 
+import com.robocontacts.domain.ConnectedPlatform;
+import com.robocontacts.domain.CurrentUser;
+import com.robocontacts.domain.SocialPlatform;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
@@ -10,6 +13,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
@@ -22,6 +26,7 @@ import java.net.URISyntaxException;
 @Service
 public class VkService {
     private static final Logger log = LoggerFactory.getLogger(VkService.class);
+    private final ConnectedPlatformService connectedPlatformService;
 
     @Value("${application.hostname}")
     private String host;
@@ -37,6 +42,10 @@ public class VkService {
 
     @Value("${platforms.vk.app.redirectUrl}")
     private String redirectUri;
+
+    public VkService(ConnectedPlatformService connectedPlatformService) {
+        this.connectedPlatformService = connectedPlatformService;
+    }
 
     public String getOAuthUrl() {
         try {
@@ -62,6 +71,17 @@ public class VkService {
                     .userAuthorizationCodeFlow(appId, appSecret, getRedirectUri(), code)
                     .execute();
             UserActor actor = new UserActor(authResponse.getUserId(), authResponse.getAccessToken());
+
+            ConnectedPlatform connectedPlatform = new ConnectedPlatform();
+            CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            connectedPlatform.setUser(currentUser.getUser());
+            connectedPlatform.setAccessToken(authResponse.getAccessToken());
+            connectedPlatform.setExpiresIn(authResponse.getExpiresIn());
+            connectedPlatform.setVkId(authResponse.getUserId());
+            connectedPlatform.setSocialPlatform(SocialPlatform.VK);
+            connectedPlatformService.save(connectedPlatform);
+
+
             log.debug("Actor {}", actor);
         } catch (OAuthException e) {
 
@@ -74,4 +94,9 @@ public class VkService {
     private String getRedirectUri() {
         return host + redirectUri;
     }
+
+
+   // public void get
+
+
 }
