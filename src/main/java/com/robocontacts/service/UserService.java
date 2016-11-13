@@ -1,5 +1,6 @@
 package com.robocontacts.service;
 
+import com.robocontacts.SecurityHelper;
 import com.robocontacts.domain.Role;
 import com.robocontacts.domain.User;
 import com.robocontacts.domain.UserCreateForm;
@@ -21,7 +22,7 @@ import java.util.List;
 @Service
 @Transactional
 public class UserService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
 
@@ -31,17 +32,28 @@ public class UserService {
     }
 
     public User getUserById(long id) {
-        LOGGER.debug("Getting user ={}", id);
+        log.debug("Getting user ={}", id);
         return userRepository.findOne(id);
     }
 
+    @Transactional(readOnly = true)
+    public User getCurrentUser(){
+        User user = SecurityHelper.getCurrentUser();
+        if (user == null){
+            log.debug("Current user is empty");
+            // todo: make custom exception
+            throw new RuntimeException("Current user is empty");
+        }
+        return getUserById(user.getId());
+    }
+
     public User getUserByLogin(String login) {
-        LOGGER.debug("Getting user by name ={}", login);
+        log.debug("Getting user by name ={}", login);
         return userRepository.findByLogin(login);
     }
 
     public List<User> getAllUsers() {
-        LOGGER.debug("Getting all users");
+        log.debug("Getting all users");
         List<User> users = new ArrayList<>();
         for (User user:userRepository.findAll()){
             users.add(user);
@@ -50,7 +62,7 @@ public class UserService {
     }
 
     public User create(UserCreateForm form) {
-        LOGGER.debug("Creating new user");
+        log.debug("Creating new user");
         User user = new User();
         user.setLogin(form.getLogin());
         user.setPassword(new BCryptPasswordEncoder().encode(form.getPassword()));
@@ -59,7 +71,7 @@ public class UserService {
     }
 
     public User save(User user) {
-        LOGGER.debug("Saving user");
+        log.debug("Saving user");
         if (user.getId() == null){
             user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         }
@@ -67,7 +79,7 @@ public class UserService {
     }
 
     public void delete(User user) {
-        LOGGER.debug("Deleting user");
+        log.debug("Deleting user");
         userRepository.delete(user);
     }
 }

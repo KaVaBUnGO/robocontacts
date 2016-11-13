@@ -1,5 +1,8 @@
 package com.robocontacts.web;
 
+import com.robocontacts.domain.SocialPlatform;
+import com.robocontacts.domain.User;
+import com.robocontacts.service.UserService;
 import com.robocontacts.service.VkService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,15 +20,26 @@ public class ProfileController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final VkService vkService;
+    private final UserService userService;
 
     @Autowired
-    public ProfileController(VkService vkService) {
+    public ProfileController(VkService vkService, UserService userService) {
         this.vkService = vkService;
+        this.userService = userService;
     }
 
     @RequestMapping("/profile")
     public String getProfilePage(Model model) {
+        User user = userService.getCurrentUser();
+        model.addAttribute("user", user);
+        boolean vkConnected = user.getSocialPlatforms().stream().filter(connectedPlatform -> connectedPlatform.getSocialPlatform() == SocialPlatform.VK).count() > 0;
+        if (vkConnected){
+            String vkPhotoUrl = vkService.getVkPhoto(user.getSocialPlatforms().stream().filter(connectedPlatform -> connectedPlatform.getSocialPlatform() == SocialPlatform.VK).findFirst().orElse(null));
+            model.addAttribute("vkPhotoUrl", vkPhotoUrl);
+        }
+        model.addAttribute("vkConnected", vkConnected);
 
+        model.addAttribute("googleConnected", user.getSocialPlatforms().stream().filter(connectedPlatform -> connectedPlatform.getSocialPlatform() == SocialPlatform.GOOGLE).count() > 0);
         log.debug("Getting home page");
         return "profile";
     }

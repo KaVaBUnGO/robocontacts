@@ -6,9 +6,14 @@ import com.robocontacts.domain.SocialPlatform;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
+import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.exceptions.OAuthException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.objects.UserAuthResponse;
+import com.vk.api.sdk.objects.users.UserXtrCounters;
+import com.vk.api.sdk.queries.users.UserField;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
+import java.util.List;
 
 
 /**
@@ -65,8 +71,7 @@ public class VkService {
 
     public void connect(String code) {
         try {
-            TransportClient transportClient = new HttpTransportClient();
-            VkApiClient vk = new VkApiClient(transportClient);
+            VkApiClient vk = getVkApiClient();
             UserAuthResponse authResponse = vk.oauth()
                     .userAuthorizationCodeFlow(appId, appSecret, getRedirectUri(), code)
                     .execute();
@@ -91,12 +96,30 @@ public class VkService {
         }
     }
 
+    public String getVkPhoto(ConnectedPlatform connectedPlatform) {
+        try {
+            VkApiClient vk = getVkApiClient();
+            UserActor actor = new UserActor((int) connectedPlatform.getVkId(), connectedPlatform.getAccessToken());
+            List<UserXtrCounters> userXtrCounterses = vk.users().get(actor).fields(UserField.PHOTO_400_ORIG).execute();
+            if (CollectionUtils.isNotEmpty(userXtrCounterses)){
+                return userXtrCounterses.stream().findFirst().orElse(null).getPhoto400Orig();
+            }
+        } catch (ApiException | ClientException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private String getRedirectUri() {
         return host + redirectUri;
     }
 
+    private VkApiClient getVkApiClient() {
+        TransportClient transportClient = new HttpTransportClient();
+        return new VkApiClient(transportClient);
+    }
 
-   // public void get
+    // public void get
 
 
 }
