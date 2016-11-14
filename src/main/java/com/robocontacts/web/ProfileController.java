@@ -16,16 +16,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * Created by ekaterina on 25.10.2016.
  */
 @Controller
-public class ProfileController {
+public class ProfileController extends AbstractController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final VkService vkService;
-    private final UserService userService;
 
     @Autowired
     public ProfileController(VkService vkService, UserService userService) {
+        super(userService);
         this.vkService = vkService;
-        this.userService = userService;
     }
 
     @RequestMapping("/profile")
@@ -33,9 +32,8 @@ public class ProfileController {
         User user = userService.getCurrentUser();
         model.addAttribute("user", user);
         boolean vkConnected = user.getSocialPlatforms().stream().filter(connectedPlatform -> connectedPlatform.getSocialPlatform() == SocialPlatform.VK).count() > 0;
-        if (vkConnected){
-            String vkPhotoUrl = vkService.getVkPhoto(user.getSocialPlatforms().stream().filter(connectedPlatform -> connectedPlatform.getSocialPlatform() == SocialPlatform.VK).findFirst().orElse(null));
-            model.addAttribute("vkPhotoUrl", vkPhotoUrl);
+        if (vkConnected) {
+            model.addAttribute("vkPhotoUrl", user.getUserInfo().getBigPhotoUrl());
         }
         model.addAttribute("vkConnected", vkConnected);
 

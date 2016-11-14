@@ -1,8 +1,9 @@
 package com.robocontacts.service;
 
 import com.robocontacts.domain.ConnectedPlatform;
-import com.robocontacts.domain.CurrentUser;
 import com.robocontacts.domain.SocialPlatform;
+import com.robocontacts.domain.User;
+import com.robocontacts.domain.UserInfo;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
@@ -18,8 +19,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -32,7 +33,9 @@ import java.util.List;
 @Service
 public class VkService {
     private static final Logger log = LoggerFactory.getLogger(VkService.class);
+
     private final ConnectedPlatformService connectedPlatformService;
+    private final UserService userService;
 
     @Value("${application.hostname}")
     private String host;
@@ -49,8 +52,9 @@ public class VkService {
     @Value("${platforms.vk.app.redirectUrl}")
     private String redirectUri;
 
-    public VkService(ConnectedPlatformService connectedPlatformService) {
+    public VkService(ConnectedPlatformService connectedPlatformService, UserService userService) {
         this.connectedPlatformService = connectedPlatformService;
+        this.userService = userService;
     }
 
     public String getOAuthUrl() {
@@ -68,7 +72,7 @@ public class VkService {
             throw new RuntimeException("Create VK oauth url failed");
         }
     }
-
+    @Transactional
     public void connect(String code) {
         try {
             VkApiClient vk = getVkApiClient();
@@ -76,33 +80,37 @@ public class VkService {
                     .userAuthorizationCodeFlow(appId, appSecret, getRedirectUri(), code)
                     .execute();
             UserActor actor = new UserActor(authResponse.getUserId(), authResponse.getAccessToken());
-
             ConnectedPlatform connectedPlatform = new ConnectedPlatform();
-            CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            connectedPlatform.setUser(currentUser.getUser());
+            User user = userService.getCurrentUser();
+            connectedPlatform.setUser(user);
             connectedPlatform.setAccessToken(authResponse.getAccessToken());
             connectedPlatform.setExpiresIn(authResponse.getExpiresIn());
             connectedPlatform.setVkId(authResponse.getUserId());
             connectedPlatform.setSocialPlatform(SocialPlatform.VK);
             connectedPlatformService.save(connectedPlatform);
-
-
+            UserInfo userInfo = fillConnectedPlatformInfo(connectedPlatform, user);
+            user.setUserInfo(userInfo);
+            userService.save(user);
             log.debug("Actor {}", actor);
         } catch (OAuthException e) {
-
             e.getRedirectUri();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public String getVkPhoto(ConnectedPlatform connectedPlatform) {
+    public UserXtrCounters getVkUserFields(ConnectedPlatform connectedPlatform) {
         try {
             VkApiClient vk = getVkApiClient();
             UserActor actor = new UserActor((int) connectedPlatform.getVkId(), connectedPlatform.getAccessToken());
-            List<UserXtrCounters> userXtrCounterses = vk.users().get(actor).fields(UserField.PHOTO_400_ORIG).execute();
-            if (CollectionUtils.isNotEmpty(userXtrCounterses)){
-                return userXtrCounterses.stream().findFirst().orElse(null).getPhoto400Orig();
+            List<UserXtrCounters> userXtrCounterses = vk.users().get(actor).fields(
+                    UserField.PHOTO_50,
+                    UserField.PHOTO_100,
+                    UserField.PHOTO_200,
+                    UserField.PHOTO_400_ORIG
+            ).execute();
+            if (CollectionUtils.isNotEmpty(userXtrCounterses)) {
+                return userXtrCounterses.stream().findFirst().orElse(null);
             }
         } catch (ApiException | ClientException e) {
             e.printStackTrace();
@@ -119,7 +127,15 @@ public class VkService {
         return new VkApiClient(transportClient);
     }
 
-    // public void get
-
-
+    private UserInfo fillConnectedPlatformInfo(ConnectedPlatform connectedPlatform, User user) {
+        UserInfo userInfo = new UserInfo();
+        UserXtrCounters vkFields = getVkUserFields(connectedPlatform);
+        userInfo.setFirstName(vkFields.getFirstName());
+        userInfo.setLastName(vkFields.getLastName());
+        userInfo.setSmallPhotoUrl(vkFields.getPhoto100());
+        userInfo.setMediumPhotoUrl(vkFields.getPhoto200());
+        userInfo.setBigPhotoUrl(vkFields.getPhoto400Orig());
+        userInfo.setUser(user);
+        return userInfo;
+    }
 }

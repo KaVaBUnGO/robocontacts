@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,17 +25,15 @@ public class ConnectedPlatformService {
         this.connectedPlatformRepository = connectedPlatformRepository;
     }
 
-
+    @Transactional(readOnly = true)
     public List<ConnectedPlatform> getConnectedPlatformByUserId(Long id){
         log.debug("Getting connectedPlatform by userId");
         return connectedPlatformRepository.findByUserId(id);
     }
 
-
+    @Transactional
     public ConnectedPlatform save(ConnectedPlatform connectedPlatform){
         log.debug("Saving platform={}\", connectedPlatform");
         return connectedPlatformRepository.save(connectedPlatform);
     }
-
-
 }

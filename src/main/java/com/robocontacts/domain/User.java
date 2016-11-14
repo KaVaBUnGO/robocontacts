@@ -26,6 +26,9 @@ public class User extends BasicEntity implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<ConnectedPlatform> socialPlatforms = new ArrayList<>();
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserInfo userInfo;
+
     public List<ConnectedPlatform> getSocialPlatforms() {
         return socialPlatforms;
     }
@@ -56,5 +59,13 @@ public class User extends BasicEntity implements Serializable {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 }

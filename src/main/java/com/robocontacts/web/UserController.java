@@ -26,7 +26,7 @@ import javax.validation.Valid;
  */
 
 @Controller
-public class UserController {
+public class UserController extends AbstractController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
@@ -36,17 +36,16 @@ public class UserController {
     protected static final String PATH_GET = "users/get/{userId}";
     protected static final String PATH_DELETE = "/users/delete/{userId}";
 
-    private final UserService userService;
     private final UserCreateFormValidator userCreateFormValidator;
 
     @Autowired
     public UserController(UserService userService, UserCreateFormValidator userCreateFormValidator) {
-        this.userService = userService;
+        super(userService);
         this.userCreateFormValidator = userCreateFormValidator;
     }
 
     @InitBinder("form")
-    public void initBinder(WebDataBinder binder){
+    public void initBinder(WebDataBinder binder) {
         binder.addValidators(userCreateFormValidator);
     }
 

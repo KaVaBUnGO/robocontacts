@@ -1,13 +1,8 @@
 package com.robocontacts.web.callback;
 
-import com.robocontacts.domain.ConnectedPlatform;
-import com.robocontacts.domain.CurrentUser;
-import com.robocontacts.domain.SocialPlatform;
-import com.robocontacts.repository.ConnectedPlatformRepository;
 import com.robocontacts.service.ConnectedPlatformService;
 import com.robocontacts.service.VkService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 

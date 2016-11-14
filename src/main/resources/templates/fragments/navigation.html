@@ -15,11 +15,62 @@
                     <li sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/users}" href="/users"> Пользователи </a></li>
                     <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/profile}" href="profile"> Профиль </a></li>
                     <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/settings}" href="settings"> Настройки </a></li>
-                    <li sec:authorize="isAuthenticated()">Вы зашли под: <div sec:authentication="name"></div></li>
                     <li sec:authorize="isAnonymous()"><a th:href="@{/login}" href="login"> Войти </a></li>
                     <li sec:authorize="isAnonymous()"><a th:href="@{/user/create}" href="/user/create"> Регистрация </a></li>
-                    <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}" href="logout"> Выйти </a></li>
                 </ul>
+                <th:block th:if="${currentUser != null}">
+                    <th:block th:if="${currentUser.userInfo!=null}">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-user"></span> 
+                                    <strong th:text="${currentUser.userInfo.firstName}">UserName</strong>
+                                    <span class="glyphicon glyphicon-chevron-down"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <div class="navbar-login">
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <p class="text-center">
+                                                        <img style="border-radius: 14px;" th:src="@{${currentUser.userInfo.smallPhotoUrl}}"/>
+                                                    </p>
+                                                </div>
+                                                <div class="col-lg-8">
+                                                    <p class="text-left">
+                                                        <strong th:text="${currentUser.userInfo.firstName+' '+currentUser.userInfo.lastName}">John Doe</strong>
+                                                    </p>
+                                                    <p class="text-left small">test@email.com</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <div class="navbar-login navbar-login-session">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <p>
+                                                        <a th:href="@{/logout}" class="btn btn-danger btn-block">Logout</a>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </th:block>
+                    <th:block th:if="${currentUser.userInfo==null}">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle">
+                                    <strong th:text="${currentUser.login}">UserName</strong>
+                                </a>
+                            </li>
+                        </ul>
+                    </th:block>
+                </th:block>
             </div>
         </div>
     </div>

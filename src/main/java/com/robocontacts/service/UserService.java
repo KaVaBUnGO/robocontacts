@@ -40,9 +40,7 @@ public class UserService {
     public User getCurrentUser(){
         User user = SecurityHelper.getCurrentUser();
         if (user == null){
-            log.debug("Current user is empty");
-            // todo: make custom exception
-            throw new RuntimeException("Current user is empty");
+            return null;
         }
         return getUserById(user.getId());
     }
