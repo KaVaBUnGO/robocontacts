@@ -2,6 +2,7 @@ package com.robocontacts.web;
 
 import com.robocontacts.domain.SocialPlatform;
 import com.robocontacts.domain.User;
+import com.robocontacts.service.GoogleService;
 import com.robocontacts.service.UserService;
 import com.robocontacts.service.VkService;
 import org.slf4j.Logger;
@@ -20,11 +21,13 @@ public class ProfileController extends AbstractController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final VkService vkService;
+    private final GoogleService googleService;
 
     @Autowired
-    public ProfileController(VkService vkService, UserService userService) {
+    public ProfileController(VkService vkService, UserService userService, GoogleService googleService) {
         super(userService);
         this.vkService = vkService;
+        this.googleService = googleService;
     }
 
     @RequestMapping("/profile")
@@ -55,8 +58,9 @@ public class ProfileController extends AbstractController {
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.POST, params = {"connectGoogle"})
-    public String build(Model model) {
-        return "/profile";
+    public String connectGoogle(Model model)
+    {
+        return "redirect:" + googleService.getOAuthUrl();
     }
 
 }
