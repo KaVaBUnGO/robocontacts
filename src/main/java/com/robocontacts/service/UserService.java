@@ -1,10 +1,10 @@
 package com.robocontacts.service;
 
-import com.robocontacts.SecurityHelper;
 import com.robocontacts.domain.Role;
 import com.robocontacts.domain.User;
 import com.robocontacts.domain.UserCreateForm;
 import com.robocontacts.repository.UserRepository;
+import com.robocontacts.util.SecurityHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

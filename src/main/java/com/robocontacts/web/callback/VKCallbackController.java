@@ -27,7 +27,6 @@ public class VKCallbackController {
     @RequestMapping("/callback")
     public String callback(HttpServletRequest httpServletRequest){
         vkService.connect(httpServletRequest.getParameter("code"));
-
         return "redirect:/profile";
     }
 }

@@ -1,9 +1,12 @@
 package com.robocontacts.dto;
 
+import java.io.Serializable;
+
 /**
  * Created by ekaterina on 15.11.2016.
  */
-public class GoogleAuthResponse {
+public class GoogleAuthResponse implements Serializable{
+    private static final long serialVersionUID = 1L;
 
     private String access_token;
     private long expires_in;

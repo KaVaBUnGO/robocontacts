@@ -1,4 +1,4 @@
-package com.robocontacts;
+package com.robocontacts.util;
 
 import com.robocontacts.domain.CurrentUser;
 import com.robocontacts.domain.User;
