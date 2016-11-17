@@ -6,8 +6,20 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.gdata.client.Query;
+import com.google.gdata.client.contacts.ContactsService;
+import com.google.gdata.data.Link;
+import com.google.gdata.data.contacts.ContactEntry;
+import com.google.gdata.data.contacts.ContactFeed;
+import com.google.gdata.data.extensions.Email;
+import com.google.gdata.data.extensions.Name;
+import com.google.gdata.data.extensions.PhoneNumber;
+import com.google.gdata.util.ContentType;
+import com.google.gdata.util.PreconditionFailedException;
+import com.google.gdata.util.ServiceException;
 import com.robocontacts.dto.GoogleAuthResponse;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -23,7 +35,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +60,9 @@ public class GoogleService {
     private final String CLIENT_SECRET = "dI7ikjKLQKSfFuJNfgOVxwPJ";
     private final String REDIRECT_URI = "http://localhost:8080/oauth2callback";
     private final String APPLICATION_NAME = "robocontacts";
+    private final String SCOPE = "https://www.google.com/m8/feeds";
+    private final String USER_EMAIL = "katyushkachernova@gmail.com";
+
 
     @Autowired
     public GoogleService(ConnectedPlatformService connectedPlatformService, UserService userService) {
@@ -57,7 +75,7 @@ public class GoogleService {
             URIBuilder uriBuilder = new URIBuilder("https://accounts.google.com/o/oauth2/auth");
             uriBuilder.addParameter("client_id", CLIENT_ID);
             uriBuilder.addParameter("redirect_uri", REDIRECT_URI);
-            uriBuilder.addParameter("scope", "email");
+            uriBuilder.addParameter("scope", SCOPE);
             uriBuilder.addParameter("response_type", "code");
             return uriBuilder.toString();
         } catch (URISyntaxException e) {
@@ -70,7 +88,7 @@ public class GoogleService {
     @Transactional
     public void connect(String code){
         try {
-            String postToken = getTokenUrl(code);
+
             HttpClient httpClient = HttpClientBuilder.create().build();
 
             HttpPost post = new HttpPost(
@@ -90,30 +108,104 @@ public class GoogleService {
             String content = IOUtils.toString(response.getEntity().getContent());
             GoogleAuthResponse googleAuthResponse= objectMapper.readValue(content, GoogleAuthResponse.class);
 
-            GoogleCredential googleCredential = new GoogleCredential().setAccessToken(googleAuthResponse.getAccess_token());
+            ArrayList<String> SCOPES = new ArrayList<>();
+            SCOPES.add(SCOPE);
 
-            HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+            GoogleCredential.Builder builder = new GoogleCredential.Builder();
+            builder.setTransport(GoogleNetHttpTransport.newTrustedTransport());
+            builder.setJsonFactory(JacksonFactory.getDefaultInstance());
+            builder.setClientSecrets(CLIENT_ID, CLIENT_SECRET);
+
+            GoogleCredential googleCredential1 = builder.build();
+            googleCredential1.setAccessToken(googleAuthResponse.getAccess_token()).setExpiresInSeconds(googleAuthResponse.getExpires_in());
+
+            ContactsService contactsService = new ContactsService(APPLICATION_NAME);
+            contactsService.setOAuth2Credentials(googleCredential1);
+            Query query = new Query(new URL("https://www.google.com/m8/feeds/contacts/default/full"));
+            query.setMaxResults(10_000);
+            ContactFeed allContactsFeed = contactsService.getFeed(query, ContactFeed.class);
+            for(ContactEntry contact : allContactsFeed.getEntries()) {
+                if (contact.hasPhoneNumbers()) {
+                    if (contact.hasName()) {
+                        Name name = contact.getName();
+                        if (name.hasFullName()) {
+                            String fullNameToDisplay = name.getFullName().getValue();
+                            System.out.print("\t\t" + fullNameToDisplay);
+                        } else {
+                            System.out.println("\t\t (no full name found)");
+                        }
+                    }
+                    for (Email email : contact.getEmailAddresses()) {
+                        System.out.print(" " + email.getAddress());
+
+                        //System.out.println(contact.getEmailAddresses());
+                    }
+                    for (PhoneNumber phoneNumber : contact.getPhoneNumbers())
+                        System.out.print(" " + phoneNumber.getPhoneNumber());
+
+                    byte[] updPhoto = getBytePhoto();
+                    updatePhoto(contactsService, updPhoto, contact);
+                }
+                System.out.println(" " + contact.getId());
+
+            }
+
+
 
         } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+       // } catch (ServiceException e) {
+        //    e.printStackTrace();
+        } catch (ServiceException e) {
             e.printStackTrace();
         }
     }
 
-    public String getTokenUrl(String code) {
+
+    private byte[] getBytePhoto(){
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            URIBuilder uriBuilder = new URIBuilder("https://accounts.google.com/o/oauth2/token");
-            uriBuilder.addParameter("code", code);
-            uriBuilder.addParameter("client_id", CLIENT_ID);
-            uriBuilder.addParameter("client_secret", CLIENT_SECRET);
-            uriBuilder.addParameter("redirect_uri", REDIRECT_URI);
-            uriBuilder.addParameter("grant_type", "authorization_code");
-            return uriBuilder.toString();
-        } catch (URISyntaxException e) {
-            log.debug("Create Google oauth url failed");
-            // todo: implement custom exceptions later
-            throw new RuntimeException("Create Google oauth url failed");
+        URL toDownload = new URL("https://pp.vk.me//c604826//v604826439//10848//6qPcMv4SLBg.jpg");
+            byte[] chunk = new byte[4096];
+            int bytesRead;
+            InputStream stream = toDownload.openStream();
+
+            while ((bytesRead = stream.read(chunk)) > 0) {
+                outputStream.write(chunk, 0, bytesRead);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return outputStream.toByteArray();
+    }
+
+
+    private void updatePhoto(ContactsService myService, byte[] photoData, ContactEntry contact) throws ServiceException, IOException{
+        Link photoLink = contact.getContactPhotoLink();
+        URL photoUrl = null;
+        photoUrl = new URL(photoLink.getHref());
+
+
+        com.google.gdata.client.Service.GDataRequest request = null;
+        request = myService.createRequest(com.google.gdata.client.Service.GDataRequest.RequestType.UPDATE,
+                    photoUrl, new ContentType("image/jpeg"));
+
+
+        request.setEtag(photoLink.getEtag());
+
+        OutputStream requestStream = request.getRequestStream();
+        requestStream.write(photoData);
+
+        try {
+            request.execute();
+        } catch (PreconditionFailedException e) {
+            // Etags mismatch: handle the exception.
         }
     }
+
+
 
 }
