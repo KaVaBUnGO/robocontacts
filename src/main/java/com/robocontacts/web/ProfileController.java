@@ -1,5 +1,7 @@
 package com.robocontacts.web;
 
+import com.robocontacts.domain.FriendsInfo;
+import com.robocontacts.domain.FriendsInfoGoogle;
 import com.robocontacts.domain.SocialPlatform;
 import com.robocontacts.domain.User;
 import com.robocontacts.service.GoogleService;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.List;
 
 /**
  * Created by ekaterina on 25.10.2016.
@@ -40,7 +44,9 @@ public class ProfileController extends AbstractController {
         }
         model.addAttribute("vkConnected", vkConnected);
 
-        model.addAttribute("googleConnected", user.getSocialPlatforms().stream().filter(connectedPlatform -> connectedPlatform.getSocialPlatform() == SocialPlatform.GOOGLE).count() > 0);
+        boolean googleConnected = user.getSocialPlatforms().stream().filter(connectedPlatform -> connectedPlatform.getSocialPlatform() == SocialPlatform.GOOGLE).count() > 0;
+
+        model.addAttribute("googleConnected", googleConnected);
         log.debug("Getting home page");
         return "profile";
     }
@@ -61,6 +67,16 @@ public class ProfileController extends AbstractController {
     public String connectGoogle(Model model)
     {
         return "redirect:" + googleService.getOAuthUrl();
+    }
+
+    @RequestMapping(value = "/profile", method = RequestMethod.POST, params = {"selectContacts"})
+    public String selectContacts(Model model)
+    {
+        List<FriendsInfo> friendsInfo = vkService.getFriendsInfo();
+        List<FriendsInfoGoogle> friendsInfoGoogles = googleService.getFriendsInfoGoogle();
+        model.addAttribute("friendsInfo", friendsInfo);
+        model.addAttribute("friendsInfoGoogles", friendsInfoGoogles);
+        return "profile";
     }
 
 }

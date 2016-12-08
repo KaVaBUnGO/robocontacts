@@ -17,6 +17,7 @@ import com.google.gdata.data.extensions.PhoneNumber;
 import com.google.gdata.util.ContentType;
 import com.google.gdata.util.PreconditionFailedException;
 import com.google.gdata.util.ServiceException;
+import com.robocontacts.domain.*;
 import com.robocontacts.dto.GoogleAuthResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -86,7 +87,7 @@ public class GoogleService {
     }
 
     @Transactional
-    public void connect(String code){
+    public void connect(String code) {
         try {
 
             HttpClient httpClient = HttpClientBuilder.create().build();
@@ -106,26 +107,38 @@ public class GoogleService {
             post.setEntity(new UrlEncodedFormEntity(urlParameters));
             HttpResponse response = httpClient.execute(post);
             String content = IOUtils.toString(response.getEntity().getContent());
-            GoogleAuthResponse googleAuthResponse= objectMapper.readValue(content, GoogleAuthResponse.class);
+            GoogleAuthResponse googleAuthResponse = objectMapper.readValue(content, GoogleAuthResponse.class);
 
+            ConnectedPlatform connectedPlatform = new ConnectedPlatform();
+            User user = userService.getCurrentUser();
+            connectedPlatform.setUser(user);
+            connectedPlatform.setAccessToken(googleAuthResponse.getAccess_token());
+            connectedPlatform.setSocialPlatform(SocialPlatform.GOOGLE);
+            connectedPlatform.setExpiresIn(googleAuthResponse.getExpires_in());
+            connectedPlatform.setVkId(0);
+            connectedPlatformService.save(connectedPlatform);
             ArrayList<String> SCOPES = new ArrayList<>();
             SCOPES.add(SCOPE);
-
             GoogleCredential.Builder builder = new GoogleCredential.Builder();
             builder.setTransport(GoogleNetHttpTransport.newTrustedTransport());
             builder.setJsonFactory(JacksonFactory.getDefaultInstance());
             builder.setClientSecrets(CLIENT_ID, CLIENT_SECRET);
-
             GoogleCredential googleCredential1 = builder.build();
             googleCredential1.setAccessToken(googleAuthResponse.getAccess_token()).setExpiresInSeconds(googleAuthResponse.getExpires_in());
-
+            List<FriendsInfoGoogle> friendsInfoGoogles = new ArrayList<>();
             ContactsService contactsService = new ContactsService(APPLICATION_NAME);
             contactsService.setOAuth2Credentials(googleCredential1);
             Query query = new Query(new URL("https://www.google.com/m8/feeds/contacts/default/full"));
             query.setMaxResults(10_000);
             ContactFeed allContactsFeed = contactsService.getFeed(query, ContactFeed.class);
-            for(ContactEntry contact : allContactsFeed.getEntries()) {
+            for (ContactEntry contact : allContactsFeed.getEntries()) {
                 if (contact.hasPhoneNumbers()) {
+                    FriendsInfoGoogle friendsInfoGoogle = new FriendsInfoGoogle();
+                    friendsInfoGoogle.setUserId(contact.getId());
+                    friendsInfoGoogle.setPhoneNumber(contact.getPhoneNumbers().toString());
+                    friendsInfoGoogle.setFullName(contact.getName().getFullName().toString());
+                    friendsInfoGoogle.setPhotoUrl(contact.getContactPhotoLink().getHref());
+                    friendsInfoGoogles.add(friendsInfoGoogle);
                     if (contact.hasName()) {
                         Name name = contact.getName();
                         if (name.hasFullName()) {
@@ -144,28 +157,69 @@ public class GoogleService {
                         System.out.print(" " + phoneNumber.getPhoneNumber());
 
                     byte[] updPhoto = getBytePhoto();
-                    updatePhoto(contactsService, updPhoto, contact);
+                    //updatePhoto(contactsService, updPhoto, contact);
                 }
                 System.out.println(" " + contact.getId());
-
             }
-
 
 
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
-       // } catch (ServiceException e) {
-        //    e.printStackTrace();
+            // } catch (ServiceException e) {
+            //    e.printStackTrace();
         } catch (ServiceException e) {
             e.printStackTrace();
         }
     }
 
 
-    private byte[] getBytePhoto(){
+    public List<FriendsInfoGoogle> getFriendsInfoGoogle() {
+        List<FriendsInfoGoogle> friendsInfoGoogles = new ArrayList<>();
+        ConnectedPlatform connectedPlatform = new ConnectedPlatform();
+        GoogleCredential.Builder builder = new GoogleCredential.Builder();
+        try {
+            builder.setTransport(GoogleNetHttpTransport.newTrustedTransport());
+
+            builder.setJsonFactory(JacksonFactory.getDefaultInstance());
+            builder.setClientSecrets(CLIENT_ID, CLIENT_SECRET);
+            GoogleCredential googleCredential1 = builder.build();
+            List<ConnectedPlatform> connectedPlatforms = userService.getCurrentUser().getSocialPlatforms();
+            for (ConnectedPlatform platform : connectedPlatforms) {
+                if (platform.getSocialPlatform().toString().equals("GOOGLE")) connectedPlatform = platform;
+            }
+            googleCredential1.setAccessToken(connectedPlatform.getAccessToken()).setExpiresInSeconds(connectedPlatform.getExpiresIn());
+            ContactsService contactsService = new ContactsService(APPLICATION_NAME);
+            contactsService.setOAuth2Credentials(googleCredential1);
+            Query query = new Query(new URL("https://www.google.com/m8/feeds/contacts/default/full"));
+            query.setMaxResults(10_000);
+            ContactFeed allContactsFeed = contactsService.getFeed(query, ContactFeed.class);
+            for (ContactEntry contact : allContactsFeed.getEntries()) {
+                if (contact.hasPhoneNumbers()) {
+                    FriendsInfoGoogle friendsInfoGoogle = new FriendsInfoGoogle();
+                    friendsInfoGoogle.setUserId(contact.getId());
+                    friendsInfoGoogle.setPhoneNumber(contact.getPhoneNumbers().toString()); // неверно, лист телефонов возвращается и неверно к стрингу приводится
+                    friendsInfoGoogle.setFullName(contact.getName().getFullName().getValue());
+                    friendsInfoGoogle.setPhotoUrl(contact.getContactPhotoLink().getHref());
+                    friendsInfoGoogles.add(friendsInfoGoogle);
+                }
+            }
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+            // } catch (ServiceException e) {
+            //    e.printStackTrace();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+        }
+
+
+        return friendsInfoGoogles;
+    }
+
+
+    private byte[] getBytePhoto() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-        URL toDownload = new URL("https://pp.vk.me//c604826//v604826439//10848//6qPcMv4SLBg.jpg");
+            URL toDownload = new URL("https://pp.vk.me//c604826//v604826439//10848//6qPcMv4SLBg.jpg");
             byte[] chunk = new byte[4096];
             int bytesRead;
             InputStream stream = toDownload.openStream();
@@ -183,15 +237,13 @@ public class GoogleService {
     }
 
 
-    private void updatePhoto(ContactsService myService, byte[] photoData, ContactEntry contact) throws ServiceException, IOException{
+    private void updatePhoto(ContactsService myService, byte[] photoData, ContactEntry contact) throws ServiceException, IOException {
         Link photoLink = contact.getContactPhotoLink();
         URL photoUrl = null;
         photoUrl = new URL(photoLink.getHref());
-
-
         com.google.gdata.client.Service.GDataRequest request = null;
         request = myService.createRequest(com.google.gdata.client.Service.GDataRequest.RequestType.UPDATE,
-                    photoUrl, new ContentType("image/jpeg"));
+                photoUrl, new ContentType("image/jpeg"));
 
 
         request.setEtag(photoLink.getEtag());
@@ -205,7 +257,5 @@ public class GoogleService {
             // Etags mismatch: handle the exception.
         }
     }
-
-
 
 }

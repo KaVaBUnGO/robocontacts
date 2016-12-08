@@ -4,17 +4,16 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 /**
- * @author Artur Chernov
+ * Created by ekaterina on 07.12.2016.
  */
 
 @Entity
-@Table(name = "user_info")
-public class UserInfo extends BasicEntity implements Serializable {
+@Table(name = "friends_info")
+public class FriendsInfo extends BasicEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
 
     @Column(name = "first_name")
     private String firstName;
@@ -31,18 +30,10 @@ public class UserInfo extends BasicEntity implements Serializable {
     @Column(name = "small_photo_url")
     private String smallPhotoUrl;
 
-    @Column(name = "vk_id")
-    private Integer vkId;
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
-    public UserInfo() {
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public FriendsInfo() {
     }
 
     public String getBigPhotoUrl() {
@@ -85,11 +76,19 @@ public class UserInfo extends BasicEntity implements Serializable {
         this.lastName = lastName;
     }
 
-    public Integer getVkId() {
-        return vkId;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setVkId(Integer vkId) {
-        this.vkId = vkId;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

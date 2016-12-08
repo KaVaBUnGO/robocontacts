@@ -16,12 +16,50 @@
         <div class="col-md-3 col-lg-3">
             <th:block th:if="${vkConnected}">
                 <span>Vk already connected</span>
-                <img th:src="@{${vkPhotoUrl}}"/>
+                <!---<img th:src="@{${vkPhotoUrl}}"/> -->
             </th:block>
-            <button class="form-control btn btn-success" name="connectVk" type="submit" style="margin-top: 15px;" th:unless="${vkConnected}">Подключить Vkontakte</button>
+            <button class="form-control btn btn-success" name="connectVk" type="submit" style="margin-top: 15px;"
+                    th:unless="${vkConnected}">Подключить Vkontakte
+            </button>
             <br/>
-            <span th:if="${googleConnected}">GOOGLE already connected</span>
-            <button class="form-control btn btn-success" name="connectGoogle" type="submit" style="margin-top: 15px;" th:unless="${googleConnected}">Подключить Google</button>
+            <th:block th:if="${googleConnected}">
+                <span>Google already connected</span>
+            </th:block>
+            <button class="form-control btn btn-success" name="connectGoogle" type="submit" style="margin-top: 15px;"
+                    th:unless="${googleConnected}">Подключить Google
+            </button>
+        </div>
+        <select class="selectpicker">
+            <option data-thumbnail="images/robot.png">Mustard</option>
+            <option data-content="images/robot.png">Ketchup</option>
+            <option>Barbecue</option>
+        </select>
+        <select>
+            <option>Mustard</option>
+            <option>Ketchup</option>
+            <option>Barbecue</option>
+        </select>
+        <th:block th:if="(${vkConnected} and ${googleConnected})">
+            <!-- здесь кнопка и селект должны быть, но не работает -->
+        </th:block>
+
+        <div class="col-md-3 col-lg-3">
+
+            <button class="form-control btn btn-success" name="selectContacts" type="submit" style="margin-top: 15px;">
+                Выбрать контакты
+            </button>
+            <select class="selectpicker">
+                <option th:each="info : ${friendsInfo}" th:value="${info.userId}"
+                        th:text="${info.firstName} +${' '} + ${info.lastName}" th:data-thumbnail="$(info.smallPhotoUrl)">Name
+                </option>
+            </select>
+
+            <select th:class="selectpicker">
+                <option th:each="info : ${friendsInfoGoogles}" th:value="${info.id}"
+                        th:text="${info.fullName}" th:data-thumbnail="$(info.photoUrl)">Name
+                </option>
+            </select>
+
         </div>
     </form>
 </th:block>

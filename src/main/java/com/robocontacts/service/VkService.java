@@ -1,9 +1,7 @@
 package com.robocontacts.service;
 
-import com.robocontacts.domain.ConnectedPlatform;
-import com.robocontacts.domain.SocialPlatform;
-import com.robocontacts.domain.User;
-import com.robocontacts.domain.UserInfo;
+import com.robocontacts.domain.*;
+import com.vk.api.sdk.client.Lang;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
@@ -12,6 +10,7 @@ import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.exceptions.OAuthException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.objects.UserAuthResponse;
+import com.vk.api.sdk.objects.friends.responses.GetResponse;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
 import com.vk.api.sdk.queries.users.UserField;
 import org.apache.commons.collections4.CollectionUtils;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -72,6 +72,7 @@ public class VkService {
             throw new RuntimeException("Create VK oauth url failed");
         }
     }
+
     @Transactional
     public void connect(String code) {
         try {
@@ -109,6 +110,7 @@ public class VkService {
                     UserField.PHOTO_200,
                     UserField.PHOTO_400_ORIG
             ).execute();
+
             if (CollectionUtils.isNotEmpty(userXtrCounterses)) {
                 return userXtrCounterses.stream().findFirst().orElse(null);
             }
@@ -135,7 +137,80 @@ public class VkService {
         userInfo.setSmallPhotoUrl(vkFields.getPhoto100());
         userInfo.setMediumPhotoUrl(vkFields.getPhoto200());
         userInfo.setBigPhotoUrl(vkFields.getPhoto400Orig());
+        userInfo.setVkId(vkFields.getId());
         userInfo.setUser(user);
         return userInfo;
+    }
+
+
+    public List<FriendsInfo> getFriendsInfo() {
+        List<FriendsInfo> listFriends = new ArrayList<>();
+        List<Integer> friendsId = getFriendsId();
+        FriendsInfo friendsInfo = new FriendsInfo();
+        for (Integer id : friendsId) {
+            //System.out.print(id+ " ");
+            friendsInfo = fillFriendsInfo(id);
+            listFriends.add(friendsInfo);
+            //System.out.println(friendsInfo.getFirstName());
+        }
+        return listFriends;
+    }
+
+
+    private UserXtrCounters getFriendsField(Integer friendId) {
+        VkApiClient vk = getVkApiClient();
+        List<List<UserXtrCounters>> friendsField = new ArrayList<>();
+        try {
+            List<UserXtrCounters> userXtrCounterses = vk.users().get()
+                    .userIds(friendId.toString())
+                    .fields(UserField.CONTACTS, UserField.PHOTO_50, UserField.PHOTO_100,
+                            UserField.PHOTO_200,
+                            UserField.PHOTO_400_ORIG)
+                    .execute();
+            if (CollectionUtils.isNotEmpty(userXtrCounterses)) {
+                return userXtrCounterses.stream().findFirst().orElse(null);
+            }
+        } catch (ApiException | ClientException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public List<Integer> getFriends() {
+        return getFriendsId();
+    }
+
+
+    private List<Integer> getFriendsId() {
+        try {
+            VkApiClient vk = getVkApiClient();
+            ConnectedPlatform connectedPlatform = new ConnectedPlatform();
+            List<ConnectedPlatform> list = connectedPlatformService.getConnectedPlatformByUserId(userService.getCurrentUser().getId());
+            for (ConnectedPlatform platform : list) {
+                if (platform.getSocialPlatform().toString().equals("VK")) connectedPlatform = platform;
+            }
+            UserActor actor = new UserActor((int) connectedPlatform.getVkId(), connectedPlatform.getAccessToken());
+            GetResponse getResponse = vk.friends().get(actor).execute();
+            List<Integer> friendsId = getResponse.getItems();
+            return friendsId;
+        } catch (ApiException | ClientException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    private FriendsInfo fillFriendsInfo(Integer friendId) {
+        FriendsInfo friendsInfo = new FriendsInfo();
+        UserXtrCounters vkFields = getFriendsField(friendId);
+        friendsInfo.setUserId(friendId);
+        friendsInfo.setFirstName(vkFields.getFirstName());
+        friendsInfo.setLastName(vkFields.getLastName());
+        friendsInfo.setSmallPhotoUrl(vkFields.getPhoto100());
+        friendsInfo.setMediumPhotoUrl(vkFields.getPhoto200());
+        friendsInfo.setBigPhotoUrl(vkFields.getPhoto400Orig());
+        friendsInfo.setPhoneNumber(vkFields.getMobilePhone());
+        return friendsInfo;
     }
 }
