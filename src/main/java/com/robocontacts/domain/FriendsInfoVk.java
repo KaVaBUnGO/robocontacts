@@ -8,8 +8,8 @@ import java.io.Serializable;
  */
 
 @Entity
-@Table(name = "friends_info")
-public class FriendsInfo extends BasicEntity implements Serializable {
+@Table(name = "friends_info_vk")
+public class FriendsInfoVk extends BasicEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Column(name = "user_id", nullable = false)
@@ -33,7 +33,7 @@ public class FriendsInfo extends BasicEntity implements Serializable {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    public FriendsInfo() {
+    public FriendsInfoVk() {
     }
 
     public String getBigPhotoUrl() {

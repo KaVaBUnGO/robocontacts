@@ -14,6 +14,7 @@ import com.vk.api.sdk.objects.friends.responses.GetResponse;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
 import com.vk.api.sdk.queries.users.UserField;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.comparators.BooleanComparator;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,6 +121,26 @@ public class VkService {
         return null;
     }
 
+
+
+    public String getVkInfo(Integer id) {
+        try {
+            VkApiClient vk = getVkApiClient();
+            List<UserXtrCounters> userXtrCounterses = vk.users().get().fields(
+                    UserField.PHOTO_100
+            ).execute();
+
+            if (CollectionUtils.isNotEmpty(userXtrCounterses)) {
+                return userXtrCounterses.stream().findFirst().orElse(null).getPhoto100();
+            }
+        } catch (ApiException | ClientException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
     private String getRedirectUri() {
         return host + redirectUri;
     }
@@ -143,16 +164,16 @@ public class VkService {
     }
 
 
-    public List<FriendsInfo> getFriendsInfo() {
-        List<FriendsInfo> listFriends = new ArrayList<>();
-        List<Integer> friendsId = getFriendsId();
-        FriendsInfo friendsInfo = new FriendsInfo();
+    public List<FriendsInfoVk> getFriendsInfo(Boolean flag, Long idUser) {
+        List<FriendsInfoVk> listFriends = new ArrayList<>();
+        List<Integer> friendsId = getFriendsId(flag, idUser);
+        FriendsInfoVk friendsInfoVk;
         for (Integer id : friendsId) {
-            //System.out.print(id+ " ");
-            friendsInfo = fillFriendsInfo(id);
-            listFriends.add(friendsInfo);
-            //System.out.println(friendsInfo.getFirstName());
+            System.out.print(id + " ");
+            friendsInfoVk = fillFriendsInfo(id);
+            listFriends.add(friendsInfoVk);
         }
+        System.out.println();
         return listFriends;
     }
 
@@ -177,16 +198,12 @@ public class VkService {
     }
 
 
-    public List<Integer> getFriends() {
-        return getFriendsId();
-    }
 
-
-    private List<Integer> getFriendsId() {
+    private List<Integer> getFriendsId(Boolean flag, Long id) {
         try {
             VkApiClient vk = getVkApiClient();
             ConnectedPlatform connectedPlatform = new ConnectedPlatform();
-            List<ConnectedPlatform> list = connectedPlatformService.getConnectedPlatformByUserId(userService.getCurrentUser().getId());
+            List<ConnectedPlatform> list = (flag == true) ? connectedPlatformService.getConnectedPlatformByUserId(userService.getCurrentUser().getId()) : connectedPlatformService.getConnectedPlatformByUserId(id);
             for (ConnectedPlatform platform : list) {
                 if (platform.getSocialPlatform().toString().equals("VK")) connectedPlatform = platform;
             }
@@ -201,16 +218,16 @@ public class VkService {
     }
 
 
-    private FriendsInfo fillFriendsInfo(Integer friendId) {
-        FriendsInfo friendsInfo = new FriendsInfo();
+    private FriendsInfoVk fillFriendsInfo(Integer friendId) {
+        FriendsInfoVk friendsInfoVk = new FriendsInfoVk();
         UserXtrCounters vkFields = getFriendsField(friendId);
-        friendsInfo.setUserId(friendId);
-        friendsInfo.setFirstName(vkFields.getFirstName());
-        friendsInfo.setLastName(vkFields.getLastName());
-        friendsInfo.setSmallPhotoUrl(vkFields.getPhoto100());
-        friendsInfo.setMediumPhotoUrl(vkFields.getPhoto200());
-        friendsInfo.setBigPhotoUrl(vkFields.getPhoto400Orig());
-        friendsInfo.setPhoneNumber(vkFields.getMobilePhone());
-        return friendsInfo;
+        friendsInfoVk.setUserId(friendId);
+        friendsInfoVk.setFirstName(vkFields.getFirstName());
+        friendsInfoVk.setLastName(vkFields.getLastName());
+        friendsInfoVk.setSmallPhotoUrl(vkFields.getPhoto100());
+        friendsInfoVk.setMediumPhotoUrl(vkFields.getPhoto200());
+        friendsInfoVk.setBigPhotoUrl(vkFields.getPhoto400Orig());
+        friendsInfoVk.setPhoneNumber(vkFields.getMobilePhone());
+        return friendsInfoVk;
     }
 }

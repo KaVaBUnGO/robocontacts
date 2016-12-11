@@ -175,21 +175,8 @@ public class GoogleService {
 
     public List<FriendsInfoGoogle> getFriendsInfoGoogle() {
         List<FriendsInfoGoogle> friendsInfoGoogles = new ArrayList<>();
-        ConnectedPlatform connectedPlatform = new ConnectedPlatform();
-        GoogleCredential.Builder builder = new GoogleCredential.Builder();
+        ContactsService contactsService = getContactsService();
         try {
-            builder.setTransport(GoogleNetHttpTransport.newTrustedTransport());
-
-            builder.setJsonFactory(JacksonFactory.getDefaultInstance());
-            builder.setClientSecrets(CLIENT_ID, CLIENT_SECRET);
-            GoogleCredential googleCredential1 = builder.build();
-            List<ConnectedPlatform> connectedPlatforms = userService.getCurrentUser().getSocialPlatforms();
-            for (ConnectedPlatform platform : connectedPlatforms) {
-                if (platform.getSocialPlatform().toString().equals("GOOGLE")) connectedPlatform = platform;
-            }
-            googleCredential1.setAccessToken(connectedPlatform.getAccessToken()).setExpiresInSeconds(connectedPlatform.getExpiresIn());
-            ContactsService contactsService = new ContactsService(APPLICATION_NAME);
-            contactsService.setOAuth2Credentials(googleCredential1);
             Query query = new Query(new URL("https://www.google.com/m8/feeds/contacts/default/full"));
             query.setMaxResults(10_000);
             ContactFeed allContactsFeed = contactsService.getFeed(query, ContactFeed.class);
@@ -203,14 +190,12 @@ public class GoogleService {
                     friendsInfoGoogles.add(friendsInfoGoogle);
                 }
             }
-        } catch (GeneralSecurityException | IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
-            // } catch (ServiceException e) {
-            //    e.printStackTrace();
         } catch (ServiceException e) {
             e.printStackTrace();
         }
-
 
         return friendsInfoGoogles;
     }
@@ -245,9 +230,7 @@ public class GoogleService {
         request = myService.createRequest(com.google.gdata.client.Service.GDataRequest.RequestType.UPDATE,
                 photoUrl, new ContentType("image/jpeg"));
 
-
         request.setEtag(photoLink.getEtag());
-
         OutputStream requestStream = request.getRequestStream();
         requestStream.write(photoData);
 
@@ -257,5 +240,31 @@ public class GoogleService {
             // Etags mismatch: handle the exception.
         }
     }
+
+
+    public ContactsService getContactsService() {
+        ContactsService contactsService = new ContactsService(APPLICATION_NAME);
+        ConnectedPlatform connectedPlatform = new ConnectedPlatform();
+        GoogleCredential.Builder builder = new GoogleCredential.Builder();
+        try {
+            builder.setTransport(GoogleNetHttpTransport.newTrustedTransport());
+
+            builder.setJsonFactory(JacksonFactory.getDefaultInstance());
+            builder.setClientSecrets(CLIENT_ID, CLIENT_SECRET);
+            GoogleCredential googleCredential1 = builder.build();
+            List<ConnectedPlatform> connectedPlatforms = userService.getCurrentUser().getSocialPlatforms();
+            for (ConnectedPlatform platform : connectedPlatforms) {
+                if (platform.getSocialPlatform().toString().equals("GOOGLE")) connectedPlatform = platform;
+            }
+            googleCredential1.setAccessToken(connectedPlatform.getAccessToken()).setExpiresInSeconds(connectedPlatform.getExpiresIn());
+
+            contactsService.setOAuth2Credentials(googleCredential1);
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+        }
+
+        return contactsService;
+    }
+
 
 }
