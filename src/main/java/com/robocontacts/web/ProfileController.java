@@ -85,7 +85,7 @@ public class ProfileController extends AbstractController {
     public String selectContacts(Model model)
     {
         if (vkFriends == null) {
-            vkFriends = vkService.getFriendsInfo();
+            vkFriends = vkService.getFriendsInfo(true, null);
         }
         if (googleFriends == null) {
             googleFriends  = googleService.getFriendsInfoGoogle();
