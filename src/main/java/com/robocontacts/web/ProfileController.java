@@ -2,10 +2,7 @@ package com.robocontacts.web;
 
 import com.robocontacts.domain.*;
 import com.robocontacts.repository.MatchedContactsRepository;
-import com.robocontacts.service.GoogleService;
-import com.robocontacts.service.MatchedContactsService;
-import com.robocontacts.service.UserService;
-import com.robocontacts.service.VkService;
+import com.robocontacts.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,18 +27,20 @@ public class ProfileController extends AbstractController {
     private final GoogleService googleService;
     private final MatchedContactsService matchedContactsService;
     private final MatchedContactsRepository matchedContactsRepository;
+    private final SynchronizationService synchronizationService;
 
     private List<MatchedContacts> matchedContactses;
     private List<FriendsInfoVk> vkFriends;
     private List<FriendsInfoGoogle> googleFriends;
 
     @Autowired
-    public ProfileController(VkService vkService, UserService userService, GoogleService googleService, MatchedContactsService matchedContactsService, MatchedContactsRepository matchedContactsRepository) {
+    public ProfileController(VkService vkService, UserService userService, GoogleService googleService, MatchedContactsService matchedContactsService, MatchedContactsRepository matchedContactsRepository, SynchronizationService synchronizationService) {
         super(userService);
         this.vkService = vkService;
         this.googleService = googleService;
         this.matchedContactsService = matchedContactsService;
         this.matchedContactsRepository = matchedContactsRepository;
+        this.synchronizationService = synchronizationService;
     }
 
     @RequestMapping("/profile")
@@ -90,6 +89,9 @@ public class ProfileController extends AbstractController {
         if (googleFriends == null) {
             googleFriends  = googleService.getFriendsInfoGoogle();
         }
+
+        //synchronizationService.updatePhoto(vkFriends.get(1).getSmallPhotoUrl(), googleFriends.get(7).getPhotoUrl());
+
         model.addAttribute("friendsInfoVk", vkFriends);
         model.addAttribute("friendsInfoGoogles", googleFriends);
         return getProfilePage(model);
@@ -104,6 +106,8 @@ public class ProfileController extends AbstractController {
         FriendsInfoGoogle googleFriendsInfo = googleFriends.stream().filter(friendsInfoGoogle -> friendsInfoGoogle.getUserId().equals(googleId)).findAny().get();
 
         matchedContactsService.save(vkFriendsInfo, googleFriendsInfo);
+
+
 
         model.addAttribute("friendsInfoVk", vkFriends);
         model.addAttribute("friendsInfoGoogles", googleFriends);

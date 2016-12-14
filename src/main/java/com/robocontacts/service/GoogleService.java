@@ -3,8 +3,6 @@ package com.robocontacts.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.gdata.client.Query;
 import com.google.gdata.client.contacts.ContactsService;
@@ -157,6 +155,7 @@ public class GoogleService {
                         System.out.print(" " + phoneNumber.getPhoneNumber());
 
                     byte[] updPhoto = getBytePhoto();
+
                     //updatePhoto(contactsService, updPhoto, contact);
                 }
                 System.out.println(" " + contact.getId());

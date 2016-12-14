@@ -52,6 +52,8 @@ public class ScheduledService {
         List<FriendsInfoVk> friendsInfoVksRepo = friendsInfoVkRepository.findAll();
         List<MatchedContacts> matchedContactses = matchedContactsRepository.findAll();
 
+
+
         for (MatchedContacts matchedContacts:matchedContactses) {
             String lastPhotoVk = matchedContacts.getVkPhoto();
 

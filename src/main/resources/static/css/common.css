@@ -1,0 +1,9 @@
+.panel{
+    height: 100%;
+}
+
+input.field-error, textarea.field-error { border: 1px solid #B94A48; }
+
+.invisible{
+    display: none;
+}

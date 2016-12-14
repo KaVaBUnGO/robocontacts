@@ -18,6 +18,7 @@ import org.apache.commons.collections4.comparators.BooleanComparator;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +54,7 @@ public class VkService {
     @Value("${platforms.vk.app.redirectUrl}")
     private String redirectUri;
 
+    @Autowired
     public VkService(ConnectedPlatformService connectedPlatformService, UserService userService) {
         this.connectedPlatformService = connectedPlatformService;
         this.userService = userService;

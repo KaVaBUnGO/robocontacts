@@ -48,7 +48,7 @@
             <select title="Vk friends" name="vkId" th:class="selectpicker">
                 <option th:each="info : ${friendsInfoVk}" th:value="${info.userId}"
                         th:text="${info.firstName} +${' '} + ${info.lastName}">
-                    <!--th:attr="${'data-content=\'<img src='+info.smallPhotoUrl+'>\''}">-->
+                        <!--th:data-content= <img src = "${info.smallPhotoUrl}">-->
                     Name
                 </option>
             </select>
