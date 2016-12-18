@@ -242,26 +242,31 @@ public class GoogleService {
 
 
     public ContactsService getContactsService() {
+        return getContactsService(userService.getCurrentUser());
+    }
+
+    public ContactsService getContactsService(long id) {
+        return getContactsService(userService.getUserById(id));
+    }
+
+    private ContactsService getContactsService(User user) {
         ContactsService contactsService = new ContactsService(APPLICATION_NAME);
         ConnectedPlatform connectedPlatform = new ConnectedPlatform();
         GoogleCredential.Builder builder = new GoogleCredential.Builder();
         try {
             builder.setTransport(GoogleNetHttpTransport.newTrustedTransport());
-
             builder.setJsonFactory(JacksonFactory.getDefaultInstance());
             builder.setClientSecrets(CLIENT_ID, CLIENT_SECRET);
             GoogleCredential googleCredential1 = builder.build();
-            List<ConnectedPlatform> connectedPlatforms = userService.getCurrentUser().getSocialPlatforms();
+            List<ConnectedPlatform> connectedPlatforms = user.getSocialPlatforms();
             for (ConnectedPlatform platform : connectedPlatforms) {
                 if (platform.getSocialPlatform().toString().equals("GOOGLE")) connectedPlatform = platform;
             }
             googleCredential1.setAccessToken(connectedPlatform.getAccessToken()).setExpiresInSeconds(connectedPlatform.getExpiresIn());
-
             contactsService.setOAuth2Credentials(googleCredential1);
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
         }
-
         return contactsService;
     }
 

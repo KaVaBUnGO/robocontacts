@@ -1,7 +1,7 @@
 package com.robocontacts.service;
 
 import com.robocontacts.domain.*;
-import com.vk.api.sdk.client.Lang;
+import com.robocontacts.repository.ConnectedPlatformRepository;
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
@@ -14,7 +14,6 @@ import com.vk.api.sdk.objects.friends.responses.GetResponse;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
 import com.vk.api.sdk.queries.users.UserField;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.comparators.BooleanComparator;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +37,7 @@ public class VkService {
 
     private final ConnectedPlatformService connectedPlatformService;
     private final UserService userService;
+    private final ConnectedPlatformRepository connectedPlatformRepository;
 
     @Value("${application.hostname}")
     private String host;
@@ -55,9 +55,10 @@ public class VkService {
     private String redirectUri;
 
     @Autowired
-    public VkService(ConnectedPlatformService connectedPlatformService, UserService userService) {
+    public VkService(ConnectedPlatformService connectedPlatformService, UserService userService, ConnectedPlatformRepository connectedPlatformRepository) {
         this.connectedPlatformService = connectedPlatformService;
         this.userService = userService;
+        this.connectedPlatformRepository = connectedPlatformRepository;
     }
 
     public String getOAuthUrl() {
@@ -128,9 +129,16 @@ public class VkService {
     public String getVkInfo(Integer id) {
         try {
             VkApiClient vk = getVkApiClient();
+
+            //User user = userService.getUserById(id);
+           // ConnectedPlatform platform = user.getSocialPlatforms().stream().filter(connectedPlatform -> connectedPlatform.getSocialPlatform() == SocialPlatform.VK).findFirst().get();
+            List<String> list = new ArrayList<>();
+            list.add(String.valueOf(id));
+            //UserActor actor = new UserActor((int) platform.getVkId(), platform.getAccessToken());
             List<UserXtrCounters> userXtrCounterses = vk.users().get().fields(
                     UserField.PHOTO_100
-            ).execute();
+            ).userIds(list)
+                    .execute();
 
             if (CollectionUtils.isNotEmpty(userXtrCounterses)) {
                 return userXtrCounterses.stream().findFirst().orElse(null).getPhoto100();

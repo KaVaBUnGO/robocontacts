@@ -6,6 +6,7 @@ import com.robocontacts.domain.MatchedContacts;
 import com.robocontacts.repository.MatchedContactsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -23,7 +24,7 @@ public class MatchedContactsService {
         this.matchedContactsRepository = matchedContactsRepository;
         this.userService = userService;
     }
-
+    @Transactional
     public MatchedContacts save(FriendsInfoVk friendsInfoVk, FriendsInfoGoogle friendsInfoGoogle){
         MatchedContacts matchedContacts = new MatchedContacts();
         matchedContacts.setUserId(userService.getCurrentUser().getId());

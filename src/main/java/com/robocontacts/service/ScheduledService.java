@@ -29,27 +29,18 @@ public class ScheduledService {
 
     private final SynchronizationService synchronizationService;
     private final VkService vkService;
-    private final GoogleService googleService;
-    private final FriendsInfoVkRepository friendsInfoVkRepository;
     private final MatchedContactsRepository matchedContactsRepository;
-    private final UserRepository userRepository;
 
     @Autowired
     public ScheduledService(SynchronizationService synchronizationService, VkService vkService, GoogleService googleService, FriendsInfoVkRepository friendsInfoVkRepository, MatchedContactsRepository matchedContactsRepository, UserRepository userRepository) {
         this.synchronizationService = synchronizationService;
         this.vkService = vkService;
-        this.googleService = googleService;
-        this.friendsInfoVkRepository = friendsInfoVkRepository;
         this.matchedContactsRepository = matchedContactsRepository;
-        this.userRepository = userRepository;
     }
 
-    @Scheduled(fixedRate = 120000)
+    @Scheduled(fixedRate = 12000)
     public void synchroPhoto() {
 
-
-        List<FriendsInfoGoogle> friendsInfoGoogles = googleService.getFriendsInfoGoogle();
-        List<FriendsInfoVk> friendsInfoVksRepo = friendsInfoVkRepository.findAll();
         List<MatchedContacts> matchedContactses = matchedContactsRepository.findAll();
 
 
@@ -61,7 +52,7 @@ public class ScheduledService {
 
             String newPhotoVk = vkService.getVkInfo(matchedContacts.getVkId());
 
-            if (newPhotoVk.equals(lastPhotoVk)) {
+            if (!newPhotoVk.equals(lastPhotoVk)) {
                 synchronizationService.updatePhoto(newPhotoVk, matchedContacts.getGooglePhoto());
             }
             if (!lastPhotoVk.equals(matchedContacts.getGooglePhoto())){

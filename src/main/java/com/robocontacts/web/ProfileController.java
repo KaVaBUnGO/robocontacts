@@ -90,7 +90,9 @@ public class ProfileController extends AbstractController {
             googleFriends  = googleService.getFriendsInfoGoogle();
         }
 
-        //synchronizationService.updatePhoto(vkFriends.get(1).getSmallPhotoUrl(), googleFriends.get(7).getPhotoUrl());
+        synchronizationService.updatePhoto(vkFriends.get(9).getSmallPhotoUrl(), googleFriends.get(12).getPhotoUrl());
+
+        //scheduledService.synchroPhoto();
 
         model.addAttribute("friendsInfoVk", vkFriends);
         model.addAttribute("friendsInfoGoogles", googleFriends);
@@ -106,11 +108,15 @@ public class ProfileController extends AbstractController {
         FriendsInfoGoogle googleFriendsInfo = googleFriends.stream().filter(friendsInfoGoogle -> friendsInfoGoogle.getUserId().equals(googleId)).findAny().get();
 
         matchedContactsService.save(vkFriendsInfo, googleFriendsInfo);
-
+        //scheduledService.synchroPhoto();
 
 
         model.addAttribute("friendsInfoVk", vkFriends);
         model.addAttribute("friendsInfoGoogles", googleFriends);
+        //scheduledService.synchroPhoto();
+
+
+
         return getProfilePage(model);
     }
 
