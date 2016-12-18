@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -89,7 +90,7 @@ public class VkService {
             User user = userService.getCurrentUser();
             connectedPlatform.setUser(user);
             connectedPlatform.setAccessToken(authResponse.getAccessToken());
-            connectedPlatform.setExpiresIn(authResponse.getExpiresIn());
+            connectedPlatform.setExpiresIn(new Date().getTime() + authResponse.getExpiresIn()*100);
             connectedPlatform.setVkId(authResponse.getUserId());
             connectedPlatform.setSocialPlatform(SocialPlatform.VK);
             connectedPlatformService.save(connectedPlatform);

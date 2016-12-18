@@ -12,11 +12,12 @@
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/users}" href="/users"> Пользователи </a></li>
-                    <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/profile}" href="profile"> Профиль </a></li>
-                    <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/settings}" href="settings"> Настройки </a></li>
-                    <li sec:authorize="isAnonymous()"><a th:href="@{/login}" href="login"> Войти </a></li>
-                    <li sec:authorize="isAnonymous()"><a th:href="@{/user/create}" href="/user/create"> Регистрация </a></li>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/users}"> Пользователи </a></li>
+                    <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/profile}"> Профиль </a></li>
+                    <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/contacts}"> Связать контакты </a></li>
+                    <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/settings}"> Настройки </a></li>
+                    <li sec:authorize="isAnonymous()"><a th:href="@{/login}"> Войти </a></li>
+                    <li sec:authorize="isAnonymous()"><a th:href="@{/user/create}"> Регистрация </a></li>
                 </ul>
                 <th:block th:if="${currentUser != null}">
                     <th:block th:if="${currentUser.userInfo!=null}">

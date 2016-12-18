@@ -15,7 +15,10 @@ import com.google.gdata.data.extensions.PhoneNumber;
 import com.google.gdata.util.ContentType;
 import com.google.gdata.util.PreconditionFailedException;
 import com.google.gdata.util.ServiceException;
-import com.robocontacts.domain.*;
+import com.robocontacts.domain.ConnectedPlatform;
+import com.robocontacts.domain.FriendsInfoGoogle;
+import com.robocontacts.domain.SocialPlatform;
+import com.robocontacts.domain.User;
 import com.robocontacts.dto.GoogleAuthResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -40,6 +43,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -112,7 +116,7 @@ public class GoogleService {
             connectedPlatform.setUser(user);
             connectedPlatform.setAccessToken(googleAuthResponse.getAccess_token());
             connectedPlatform.setSocialPlatform(SocialPlatform.GOOGLE);
-            connectedPlatform.setExpiresIn(googleAuthResponse.getExpires_in());
+            connectedPlatform.setExpiresIn(new Date().getTime() + googleAuthResponse.getExpires_in()*100);
             connectedPlatform.setVkId(0);
             connectedPlatformService.save(connectedPlatform);
             ArrayList<String> SCOPES = new ArrayList<>();

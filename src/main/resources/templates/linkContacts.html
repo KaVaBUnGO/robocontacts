@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html layout:decorator="layouts/layoutDefault" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>Link contacts</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="container">
+        <th:block th:unless="${platformsConnected}">
+            <div style="position: absolute;">
+                <h4>Для перехода к процедуре сопоставления контактов сначала необходимо подкючить социальные
+                    платформы.</h4>
+                <a class="btn btn-primary pull-right" th:href="@{/profile}" type="button" title="Add platform">Подключить
+                    социальные платформы</a>
+            </div>
+        </th:block>
+        <th:block th:if="${platformsConnected}">
+            <h2 style="margin-bottom: 30px;">Сопоставленные контакты</h2>
+            <table class="table table-hover table-bordered" id="linkedProfiles">
+                <thead>
+                <tr class="info">
+                    <th>Vk name</th>
+                    <th>Google name</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="match : ${matchedContactses}">
+                    <td th:text="${match.vkName}">vk name</td>
+                    <td th:text="${match.googleName}">google name</td>
+                    <td style="display: flex; width: 100px; white-space: nowrap;">
+                        <a class="btn btn-primary" type="button" title="Add platform"
+                           th:classappend="${platform.value!=null} ? 'disabled' : ''"
+                           th:onclick="'javascript:connectNewPlatform(\'' + ${platform.key} + '\');'">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                        <button class="btn btn-danger" type="button" title="Delete" style="margin-left: 5px;"
+                                th:classappend="${platform.value==null} ? 'disabled' : ''"
+                                th:onclick="'javascript:deletePlatform(\'' + ${platform.key} + '\');'">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <select name="vkId" class="selectpicker" data-live-search="true">
+                            <option>Select...</option>
+                            <option th:attr="data-thumbnail=${friend.smallPhotoUrl}" th:each="friend : ${vkFriends}"
+                                    th:text="${friend.firstName} +${' '} + ${friend.lastName}"
+                                    th:value="${friend.userId}">name
+                            </option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="googleId" class="selectpicker" data-live-search="true">
+                            <option th:each="friend : ${googleFriends}" th:value="${friend.userId}"
+                                    th:text="${friend.fullName}">Name
+                            </option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="form-control btn btn-success" name="saveMatch" th:onclick="'javascript:addFriendsConnection();'">
+                            Сопоставить
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </th:block>
+    </div>
+</th:block>
+<th:block layout:fragment="pageScript">
+    <script type="text/javascript" th:src="@{/js/profile.js}"></script>
+</th:block>
+</body>
+</html>

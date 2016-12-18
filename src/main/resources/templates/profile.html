@@ -7,79 +7,50 @@
 </head>
 <body>
 <th:block layout:fragment="content">
+    <div class="container">
+        <h2>Подключенные платформы</h2>
 
-    <div>Подключенные платформы</div>
-    <div>
-        ---------------------
+        <table class="table table-hover table-bordered" id="platforms">
+            <thead>
+            <tr class="info">
+                <th width="30%">Name</th>
+                <th width="20%">Status</th>
+                <th width="30%">Token</th>
+                <th width="15%">Expire date</th>
+                <th width="8%">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="platform : ${platforms}">
+                <td th:text="${platform.key}">platform name</td>
+                <td th:text="${platform.value!=null?'Connected':'Not connected'}">platform status</td>
+                <td>
+                    <div th:text="${platform.value!=null?platform.value.accessToken:'-'}" style="max-width:300px; text-overflow: ellipsis; overflow: hidden;">platform token</div>
+                </td>
+                <td th:text="${platform.value!=null?#dates.format(platform.value.expiresIn, 'MM/dd/yyyy HH:mm'):'-'}">platform expire</td>
+                <td style="display: flex; width: 100px; white-space: nowrap;">
+                    <a class="btn btn-primary" type="button" title="Add platform"
+                       th:classappend="${platform.value!=null} ? 'disabled' : ''"
+                       th:onclick="'javascript:connectNewPlatform(\'' + ${platform.key} + '\');'">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
+                    <button class="btn btn-danger" type="button" title="Delete" style="margin-left: 5px;"
+                            th:classappend="${platform.value==null} ? 'disabled' : ''"
+                            th:onclick="'javascript:deletePlatform(\'' + ${platform.key} + '\');'">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <a class="btn btn-primary pull-right" th:href="@{/contacts}" th:classappend="${!platformsConnected}?'disabled'"
+           type="button" title="Add platform">Связать контакты</a>
 
     </div>
-    <form th:action="@{/profile}" th:object="${form}" th:method="post">
-        <div class="col-md-3 col-lg-3">
-            <th:block th:if="${vkConnected}">
-                <span>Vk already connected</span>
-                <!---<img th:src="@{${vkPhotoUrl}}"/> -->
-            </th:block>
-            <button class="form-control btn btn-success" name="connectVk" type="submit" style="margin-top: 15px;"
-                    th:unless="${vkConnected}">Подключить Vkontakte
-            </button>
-            <br/>
-            <th:block th:if="${googleConnected}">
-                <span>Google already connected</span>
-            </th:block>
-            <button class="form-control btn btn-success" name="connectGoogle" type="submit" style="margin-top: 15px;"
-                    th:unless="${googleConnected}">Подключить Google
-            </button>
-        </div>
-    </form>
-
-    <th:block th:if="${vkConnected and googleConnected}">
-
-        <form th:action="@{/profile/select}" th:method="post">
-            <div class="col-md-3 col-lg-3">
-
-                <button class="form-control btn btn-success" name="selectContacts" type="submit"
-                        style="margin-top: 15px;">
-                    Выбрать контакты
-                </button>
-
-            </div>
-        </form>
-        <form th:action="@{/profile/save}" th:method="post">
-            <select title="Vk friends" name="vkId" th:class="selectpicker">
-                <option th:each="info : ${friendsInfoVk}" th:value="${info.userId}"
-                        th:text="${info.firstName} +${' '} + ${info.lastName}">
-                        <!--th:attr="${'data-content=\'<img src='+info.smallPhotoUrl+'>\''}">-->
-                    Name
-                </option>
-            </select>
-
-            <select title="Google friends" name="googleId" th:class="selectpicker">
-                <option th:each="info : ${friendsInfoGoogles}" th:value="${info.userId}"
-                        th:text="${info.fullName}" data-thumbnail="$(info.photoUrl)">Name
-                </option>
-            </select>
-            <div class="col-md-3 col-lg-3">
-                <button class="form-control btn btn-success" name="saveMatch" type="submit" style="margin-top: 15px;">
-                    Сопоставить
-                </button>
-
-            </div>
-
-        </form>
-
-        <div class="col-md-6">Vk name</div>
-        <div class="col-md-6">Google name</div>
-
-        <div class="row" th:each="match : ${matchedContactses}">
-
-            <div class="col-md-6" th:text="${match.vkName}">Name vk</div>
-            <div class="col-md-6" th:text="${match.googleName}">Name Google</div>
-
-        </div>
-
-
-    </th:block>
 </th:block>
-
+<th:block layout:fragment="pageScript">
+    <script type="text/javascript" th:src="@{/js/profile.js}"></script>
+</th:block>
 </body>
 </html>

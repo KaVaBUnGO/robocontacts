@@ -21,19 +21,24 @@ public class ConnectedPlatformService {
     private final ConnectedPlatformRepository connectedPlatformRepository;
 
     @Autowired
-    public ConnectedPlatformService(ConnectedPlatformRepository connectedPlatformRepository){
+    public ConnectedPlatformService(ConnectedPlatformRepository connectedPlatformRepository) {
         this.connectedPlatformRepository = connectedPlatformRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<ConnectedPlatform> getConnectedPlatformByUserId(Long id){
+    public List<ConnectedPlatform> getConnectedPlatformByUserId(Long id) {
         log.debug("Getting connectedPlatform by userId");
         return connectedPlatformRepository.findByUserId(id);
     }
 
     @Transactional
-    public ConnectedPlatform save(ConnectedPlatform connectedPlatform){
+    public ConnectedPlatform save(ConnectedPlatform connectedPlatform) {
         log.debug("Saving platform={}\", connectedPlatform");
         return connectedPlatformRepository.save(connectedPlatform);
+    }
+
+    @Transactional
+    public void delete(ConnectedPlatform connectedPlatform) {
+        connectedPlatformRepository.delete(connectedPlatform);
     }
 }
