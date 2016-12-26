@@ -36,9 +36,9 @@ public class SynchronizationService {
         this.vkService = vkService;
     }
 
-    public void updatePhoto(String vkPhoto, String googlePhoto){
+    public void updatePhoto(String vkPhoto, String googlePhoto, Long id){
         byte[] updPhoto = getBytePhoto(vkPhoto);
-        ContactsService contactsService = googleService.getContactsService();
+        ContactsService contactsService = googleService.getContactsService(id);
         try {
             updatePhoto(contactsService, updPhoto, googlePhoto);
         } catch (ServiceException e) {

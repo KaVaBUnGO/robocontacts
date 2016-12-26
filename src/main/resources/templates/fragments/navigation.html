@@ -15,7 +15,6 @@
                     <li sec:authorize="hasRole('ROLE_ADMIN')"><a th:href="@{/users}"> Пользователи </a></li>
                     <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/profile}"> Профиль </a></li>
                     <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/contacts}"> Связать контакты </a></li>
-                    <li sec:authorize="hasRole('ROLE_USER')"><a th:href="@{/settings}"> Настройки </a></li>
                     <li sec:authorize="isAnonymous()"><a th:href="@{/login}"> Войти </a></li>
                     <li sec:authorize="isAnonymous()"><a th:href="@{/user/create}"> Регистрация </a></li>
                 </ul>
@@ -23,7 +22,7 @@
                     <th:block th:if="${currentUser.userInfo!=null}">
                         <ul class="nav navbar-nav navbar-right">
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 15px 40px">
                                     <span class="glyphicon glyphicon-user"></span> 
                                     <strong th:text="${currentUser.userInfo.firstName}">UserName</strong>
                                     <span class="glyphicon glyphicon-chevron-down"></span>
@@ -37,11 +36,11 @@
                                                         <img style="border-radius: 14px;" th:src="@{${currentUser.userInfo.smallPhotoUrl}}"/>
                                                     </p>
                                                 </div>
-                                                <div class="col-lg-2">
-                                                    <p class="text-left">
+                                                <div class="col-lg-12" style="text-align: left">
+                                                    <p class="text-center">
                                                         <strong th:text="${currentUser.userInfo.firstName+' '+currentUser.userInfo.lastName}">John Doe</strong>
                                                     </p>
-                                                    <p class="text-left small">test@email.com</p>
+                                                    <p class="text-center small">test@email.com</p>
                                                 </div>
                                             </div>
                                         </div>

@@ -15,6 +15,7 @@ import java.util.List;
  */
 
 @Service
+@Transactional
 public class ConnectedPlatformService {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedPlatformService.class);

@@ -3,10 +3,6 @@ package com.robocontacts.domain;
 import javax.persistence.*;
 import java.io.Serializable;
 
-/**
- * @author Artur Chernov
- */
-
 @Entity
 @Table(name = "user_info")
 public class UserInfo extends BasicEntity implements Serializable {

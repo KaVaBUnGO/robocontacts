@@ -31,14 +31,8 @@
                     <td th:text="${match.vkName}">vk name</td>
                     <td th:text="${match.googleName}">google name</td>
                     <td style="display: flex; width: 100px; white-space: nowrap;">
-                        <a class="btn btn-primary" type="button" title="Add platform"
-                           th:classappend="${platform.value!=null} ? 'disabled' : ''"
-                           th:onclick="'javascript:connectNewPlatform(\'' + ${platform.key} + '\');'">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </a>
                         <button class="btn btn-danger" type="button" title="Delete" style="margin-left: 5px;"
-                                th:classappend="${platform.value==null} ? 'disabled' : ''"
-                                th:onclick="'javascript:deletePlatform(\'' + ${platform.key} + '\');'">
+                                th:onclick="'javascript:deleteLink(\'' + ${match.id} + '\');'">
                             <span class="glyphicon glyphicon-trash"></span>
                         </button>
                     </td>

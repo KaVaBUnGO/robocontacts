@@ -53,10 +53,10 @@ public class ScheduledService {
             String newPhotoVk = vkService.getVkInfo(matchedContacts.getVkId());
 
             if (!newPhotoVk.equals(lastPhotoVk)) {
-                synchronizationService.updatePhoto(newPhotoVk, matchedContacts.getGooglePhoto());
+                synchronizationService.updatePhoto(newPhotoVk, matchedContacts.getGooglePhoto(), matchedContacts.getUserId());
             }
             if (!lastPhotoVk.equals(matchedContacts.getGooglePhoto())){
-                synchronizationService.updatePhoto(newPhotoVk, matchedContacts.getGooglePhoto());
+                synchronizationService.updatePhoto(newPhotoVk, matchedContacts.getGooglePhoto(), matchedContacts.getUserId());
             }
 
             matchedContacts.setVkPhoto(newPhotoVk);

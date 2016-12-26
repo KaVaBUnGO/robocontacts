@@ -4,10 +4,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-/**
- * @author Artur Chernov
- */
-
 @MappedSuperclass
 public class BasicEntity implements Serializable {
     private static final long serialVersionUID = 1L;

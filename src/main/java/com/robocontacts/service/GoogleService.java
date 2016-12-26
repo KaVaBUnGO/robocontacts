@@ -152,15 +152,10 @@ public class GoogleService {
                     }
                     for (Email email : contact.getEmailAddresses()) {
                         System.out.print(" " + email.getAddress());
-
-                        //System.out.println(contact.getEmailAddresses());
                     }
                     for (PhoneNumber phoneNumber : contact.getPhoneNumbers())
                         System.out.print(" " + phoneNumber.getPhoneNumber());
-
                     byte[] updPhoto = getBytePhoto();
-
-                    //updatePhoto(contactsService, updPhoto, contact);
                 }
                 System.out.println(" " + contact.getId());
             }
@@ -168,13 +163,10 @@ public class GoogleService {
 
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
-            // } catch (ServiceException e) {
-            //    e.printStackTrace();
         } catch (ServiceException e) {
             e.printStackTrace();
         }
     }
-
 
     public List<FriendsInfoGoogle> getFriendsInfoGoogle() {
         List<FriendsInfoGoogle> friendsInfoGoogles = new ArrayList<>();
@@ -199,7 +191,6 @@ public class GoogleService {
         } catch (ServiceException e) {
             e.printStackTrace();
         }
-
         return friendsInfoGoogles;
     }
 
@@ -220,10 +211,8 @@ public class GoogleService {
             e.printStackTrace();
             return null;
         }
-
         return outputStream.toByteArray();
     }
-
 
     private void updatePhoto(ContactsService myService, byte[] photoData, ContactEntry contact) throws ServiceException, IOException {
         Link photoLink = contact.getContactPhotoLink();
@@ -243,7 +232,6 @@ public class GoogleService {
             // Etags mismatch: handle the exception.
         }
     }
-
 
     public ContactsService getContactsService() {
         return getContactsService(userService.getCurrentUser());
@@ -273,6 +261,4 @@ public class GoogleService {
         }
         return contactsService;
     }
-
-
 }

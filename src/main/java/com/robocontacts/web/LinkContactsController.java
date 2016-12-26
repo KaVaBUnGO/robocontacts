@@ -2,6 +2,7 @@ package com.robocontacts.web;
 
 import com.robocontacts.domain.FriendsInfoGoogle;
 import com.robocontacts.domain.FriendsInfoVk;
+import com.robocontacts.domain.MatchedContacts;
 import com.robocontacts.repository.MatchedContactsRepository;
 import com.robocontacts.service.GoogleService;
 import com.robocontacts.service.MatchedContactsService;
@@ -34,6 +35,8 @@ public class LinkContactsController extends AbstractController {
     private final MatchedContactsService matchedContactsService;
     private final MatchedContactsRepository matchedContactsRepository;
 
+    private List<MatchedContacts> matchedContactses;
+
     private List<FriendsInfoVk> vkFriends;
     private List<FriendsInfoGoogle> googleFriends;
 
@@ -53,16 +56,28 @@ public class LinkContactsController extends AbstractController {
         if (platformsConnected) {
             fillContacts(model);
         }
+        List<MatchedContacts> matchedContactses = matchedContactsRepository.findAll();
+        model.addAttribute("matchedContactses", matchedContactses);
         return "linkContacts";
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public String saveMatch(@ModelAttribute("vkId") String vkId, @ModelAttribute("googleId") String googleId, Model model) {
+        String newGoogleId = googleId.replace("@", "%40");
         FriendsInfoVk vkFriendsInfo = vkFriends.stream().filter(friendsInfoVk -> Objects.equals(friendsInfoVk.getUserId(), Integer.valueOf(vkId))).findFirst().get();
-        FriendsInfoGoogle googleFriendsInfo = googleFriends.stream().filter(friendsInfoGoogle -> friendsInfoGoogle.getUserId().equals(googleId)).findAny().get();
+        FriendsInfoGoogle googleFriendsInfo = googleFriends.stream().filter(friendsInfoGoogle -> friendsInfoGoogle.getUserId().equals(googleId.replace("@", "%40"))).findAny().get();
         matchedContactsService.save(vkFriendsInfo, googleFriendsInfo);
         return getLinkContactsPage(model);
     }
+
+    @RequestMapping(value = "/deleteLink", method = RequestMethod.POST)
+    public String deleteMatch(@ModelAttribute("matchId") Long matchId, Model model) {
+
+        matchedContactsRepository.delete(matchId);
+        return getLinkContactsPage(model);
+    }
+
+
 
     private void fillContacts(Model model) {
         if (vkFriends == null) {
